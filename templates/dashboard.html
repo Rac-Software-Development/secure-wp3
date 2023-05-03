@@ -2,14 +2,61 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=\, initial-scale=1.0">
+
+
   <title>Dashboard</title>
+  <p id="li"></p>
+
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script lang="Javascript">
+
+
+    $(document).ready(function () {
+
+      $.ajax({
+        url: 'http://127.0.0.1:5000/api/index',
+        dataType: 'json',
+        method: 'GET',
+
+        success: function (data) {
+          var text = ""
+          for (var i = 0; i < data.length; i++) {
+            text += data[i].name + "<br>";
+          }
+          $("#li").append(text);
+        },
+        error: function (xhr, textStatus, errorThrown) {
+          console.log("Error: " + errorThrown);
+        }
+      })
+
+    })
+    // var request = new XMLHttpRequest();
+    // var li = document.getElementById("li");
+
+
+    // request.open("GET", 'http://127.0.0.1:5000/api/index');
+    // request.onload = function () {
+    // var data = JSON.parse(request.responseText)
+    // renderHtml(data)
+    // }
+    // request.send();
+
+
+
+    // function renderHtml(data) {
+    // var htmlstring = ""
+    // for (var i = 0; i < data.length; i++) { // htmlstring +="<p>" + data[i].name + data[i].species + "</p>" // } //
+    // li.insertAdjacentHTML('beforeBegin', htmlstring); // } </script>
+
 </head>
 
 <body>
   <h1> Dashboard</h1>
+
+
 </body>
 
 </html>
