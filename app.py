@@ -28,7 +28,7 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db.init_app(app)
 
 
-@app.route("/api/index")
+@app.route("/api/index/<id>")
 def index():
     return dash
 

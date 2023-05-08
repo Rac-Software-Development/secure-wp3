@@ -19,13 +19,16 @@
         url: 'http://127.0.0.1:5000/api/index',
         dataType: 'json',
         method: 'GET',
-
         success: function (data) {
           var text = ""
           for (var i = 0; i < data.length; i++) {
             text += data[i].name + "<br>";
+
+
           }
           $("#li").append(text);
+          console.log(data);
+
         },
         error: function (xhr, textStatus, errorThrown) {
           console.log("Error: " + errorThrown);
@@ -33,6 +36,8 @@
       })
 
     })
+
+
     // var request = new XMLHttpRequest();
     // var li = document.getElementById("li");
 
