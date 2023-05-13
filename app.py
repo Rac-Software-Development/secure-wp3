@@ -32,6 +32,11 @@ db.init_app(app)
 def api_index():
     return dash
 
+@app.route("/api/bestanden", methods=["POST"])
+def bestanden():
+    if request.method == "POST":
+        
+        return request.form
 
 @app.route("/Dashboard")
 def Dashboard():

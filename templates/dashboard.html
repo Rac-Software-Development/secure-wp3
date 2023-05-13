@@ -5,7 +5,12 @@
 
 
   <title>Dashboard</title>
-  <p id="li"></p>
+  <p id="li">
+  <p id="p"></p>
+  </p>
+
+  <button onclick="button()">maak nieuw bestand aan</button>
+
 
 
 
@@ -22,12 +27,15 @@
         success: function (data) {
           var text = ""
           for (var i = 0; i < data.length; i++) {
-            text += data[i].name + "<br>";
+            text += data[i].id + " " + data[i].name + "<br>";
+
 
 
           }
           $("#li").append(text);
           console.log(data);
+
+
 
         },
         error: function (xhr, textStatus, errorThrown) {
@@ -36,6 +44,29 @@
       })
 
     })
+    function button() {
+      $.ajax({
+        url: 'http://127.0.0.1:5000/api/bestanden',
+        dataType: 'json',
+        method: 'POST',
+        data: {
+          "type": "test",
+          "database": "sqlite",
+          "applicatie-naam": "pygame"
+        },
+        success: function button(data) {
+
+          $("p").append(JSON.stringify(data));
+        },
+
+
+
+
+        error: function (xhr, textStatus, errorThrown) {
+          console.log("Error: " + errorThrown);
+        }
+      })
+    }
 
 
     // var request = new XMLHttpRequest();
