@@ -24,17 +24,10 @@ class applicaties(db.Model):
         return f"('{self.id}', '{self.naam}','{self.ip}')"
 
 
-@app.route("/", methods=["GET", "POST"])
-@app.route("/index", methods=["GET", "POST"])
+@app.route("/")
+@app.route("/index")
 def index():
-    if request.method == "POST":
-        id = request.form.get("id")
-        naam = request.form.get("naam")
-        ip = request.form.get("ip")
-
-        return render_template("app1.html", naam=naam, ip=ip)
-    else:
-        return render_template("app1.html")
+    return render_template("app1.html")
 
 
 @app.route("/applicaties/<id>", methods=["GET", "POST"])
@@ -49,9 +42,20 @@ def apps(id):
             return jsonify(app)
         else:
             return jsonify({"zet": "een cijfer na applicatie"})
+    if request.method == "POST":
+        naam = request.form.get("naam")
+        ip = request.form.get("ip")
+
+        new_app = applicaties(naam=naam, ip=ip)
+
+        db.session.add(new_app)
+
+        db.session.commit()
+
+        return render_template("app2.html", naam=naam, ip=ip)
 
     else:
-        return "niks"
+        return render_template("app2.html", naam=naam, ip=ip)
 
 
 if __name__ == "__main__":
