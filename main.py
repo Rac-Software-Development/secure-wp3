@@ -27,12 +27,14 @@ class applicaties(db.Model):
 @app.route("/", methods=["GET", "POST"])
 @app.route("/index", methods=["GET", "POST"])
 def index():
-    appname = ""
-    ip_filter = ""
     if request.method == "POST":
-        appname = request.form["appname"]
-        ip_filter = request.form["ip_filter"]
-    return render_template("app1.html", appname=appname, ip_filter=ip_filter)
+        id = request.form.get("id")
+        naam = request.form.get("naam")
+        ip = request.form.get("ip")
+
+        return render_template("app1.html", naam=naam, ip=ip)
+    else:
+        return render_template("app1.html")
 
 
 @app.route("/applicaties/<id>", methods=["GET", "POST"])
@@ -46,21 +48,7 @@ def apps(id):
             app = {"id": result[0], "naam": result[1]}
             return jsonify(app)
         else:
-            return jsonify({"zet": "een cijfer na applicatie/"})
-    elif request.method == "POST":
-        id = request.form.get("id")
-        naam = request.form.get("naam")
-        ip = request.form.get("ip")
-
-        if id and naam and ip:
-            conn = sqlite3.connect("database.db")
-            cur = conn.cursor()
-            cur.execute(
-                "INSERT INTO applicaties (id, naam, ip) VALUES (?, ?, ?)",
-                (id, naam, ip),
-            )
-            conn.commit()
-            return "Applicatie succesvol toegevoegd"
+            return jsonify({"zet": "een cijfer na applicatie"})
 
     else:
         return "niks"

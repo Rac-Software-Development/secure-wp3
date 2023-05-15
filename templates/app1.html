@@ -14,7 +14,7 @@
 <body>
   <h1>dit is mijn app</h1>
   <h2>voeg app toe</h2>
-  <form method="post">
+  <form method="post" action="/index">
     <div>
       <label for="naam" class="color">appname:</label>
       <input type="text" id="naam" name="naam" required>
@@ -25,6 +25,11 @@
     </div>
     <button type="submit">save</button>
   </form>
+  {% if naam and ip %}
+  <h2>POST Data:</h2>
+  <p>Naam: {{ naam }}</p>
+  <p>IP: {{ ip }}</p>
+  {% endif %}
   <br>
   <div>
     <p>test omgeving</p>
