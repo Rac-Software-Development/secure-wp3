@@ -34,6 +34,16 @@ def index():
     return render_template("app1.html", applicaties=applicaties)
 
 
+@app.route("/testcorrect")
+def testCorrect():
+    return render_template("testcorrect.html")
+
+
+@app.route("/pygame")
+def pygame():
+    return render_template("pygame.html")
+
+
 @app.route("/applicaties/<id>", methods=["GET", "POST"])
 def apps(id):
     if request.method == "GET":
@@ -42,10 +52,11 @@ def apps(id):
         cur.execute("SELECT * FROM applicaties WHERE id =?", (id,))
         result = cur.fetchone()
         if result:
-            app = {"id": result[0], "naam": result[1]}
-            return jsonify(app)
+            app = {"id": result[0], "naam": result[1], "ip": result[2]}
+            return render_template("applicaties.html", app=app)
         else:
-            return jsonify({"zet": "een cijfer na applicatie"})
+            return render_template("applicaties.html", app=app)
+
     if request.method == "POST":
         naam = request.form.get("naam")
         ip = request.form.get("ip")
@@ -64,7 +75,18 @@ def apps(id):
 
 @app.route("/omgevingen", methods=["GET", "POST"])
 def omegevingen():
-    return render_template("omgevingen.html")
+    if request.method == "POST":
+        naam = request.form.get("naam")
+        ip = request.form.get("ip")
+
+        new_app = applicaties(naam=naam, ip=ip)
+
+        db.session.add(new_app)
+
+        db.session.commit()
+
+    else:
+        return render_template("omgevingen.html")
 
 
 if __name__ == "__main__":

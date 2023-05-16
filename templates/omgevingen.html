@@ -11,10 +11,21 @@
 </head>
 
 <body>
+  <form method="post" action="/omgevingen">
+    <div>
+      <label for="testomgeving" class="color">testomgeving:</label>
+      <input type="text" id="test_omgeving" name="test_omgeving" required>
+    </div>
+    <div>
+      <label for="productie_omgeving">productie omgeving:</label>
+      <input type="text" id="productie_omgeving" name="productie_omgeving" required>
+    </div>
+    <button type="submit">save</button>
+  </form>
   <h1>lijst met omgevingen</h1>
   <li>
-    {% for omgeving in omgevingen%}
-    {{omgeving}}
+    {% for new_omgeving in omgevingen %}
+    <p>{{new_omgeving}}</p>
     {%endfor%}
   </li>
 </body>
