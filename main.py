@@ -24,6 +24,20 @@ class applicaties(db.Model):
         return f"('{self.id}', '{self.naam}','{self.ip}')"
 
 
+class omgevingen(db.Model):
+    __tablename__ = "omgevingen"
+    id = db.Column(db.Integer, primary_key=True)
+    test_omgeving = db.Column(db.String(120), nullable=False)
+    productie_omgeving = db.Column(db.String(120), nullable=False)
+    applicaties_id = db.Column(db.Integer, db.ForeignKey("applicaties.id"))
+    applicatie = db.relationship(
+        "Applicaties", backref=db.backref("omgevingen", lazy=True)
+    )
+
+    def __repr__(self):
+        return f"('{self.id}', '{self.test_omgeving}','{self.productie_omgeving}')"
+
+
 @app.route("/")
 @app.route("/index")
 def index():
@@ -74,19 +88,8 @@ def apps(id):
 
 
 @app.route("/omgevingen", methods=["GET", "POST"])
-def omegevingen():
-    if request.method == "POST":
-        naam = request.form.get("naam")
-        ip = request.form.get("ip")
-
-        new_app = applicaties(naam=naam, ip=ip)
-
-        db.session.add(new_app)
-
-        db.session.commit()
-
-    else:
-        return render_template("omgevingen.html")
+def omgevingen():
+    return render_template("omgevingen.html")
 
 
 if __name__ == "__main__":
