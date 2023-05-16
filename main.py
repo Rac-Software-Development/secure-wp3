@@ -27,7 +27,11 @@ class applicaties(db.Model):
 @app.route("/")
 @app.route("/index")
 def index():
-    return render_template("app1.html")
+    conn = sqlite3.connect("database.db")
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM applicaties")
+    applicaties = cur.fetchall()
+    return render_template("app1.html", applicaties=applicaties)
 
 
 @app.route("/applicaties/<id>", methods=["GET", "POST"])
@@ -56,6 +60,11 @@ def apps(id):
 
     else:
         return render_template("app2.html", naam=naam, ip=ip)
+
+
+@app.route("/omgevingen", methods=["GET", "POST"])
+def omegevingen():
+    return render_template("omgevingen.html")
 
 
 if __name__ == "__main__":

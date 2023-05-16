@@ -15,6 +15,13 @@
 <body>
   <h1>dit is mijn app</h1>
   <h2>voeg app toe</h2>
+
+  <ul class="ul1">
+    <h3>applicaites</h3>
+    {% for applicatie in applicaties %}
+    <li>{{ applicatie }}</li>
+    {% endfor %}
+  </ul>
   <form method="post" action="/applicaties/<id>">
     <div>
       <label for="naam" class="color">appname:</label>
@@ -41,10 +48,7 @@
     <input type="text" name="" id="">
     <button> <a href="/omgevingen">nieuwe omgeving</a></button>
   </div>
-  {%for result in app%}
-  <p>naam:{{result.naam}}</p>
-  <p>ip{{result.ip}}</p>
-  {%endfor%}
+
   <table>
     <thead>
 
