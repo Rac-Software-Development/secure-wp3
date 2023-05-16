@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="en">
 
 <head>
@@ -25,11 +26,7 @@
     </div>
     <button type="submit">save</button>
   </form>
-  {% if naam and ip %}
-  <h2>POST Data:</h2>
-  <p>Naam: {{ naam }}</p>
-  <p>IP: {{ ip }}</p>
-  {% endif %}
+
   <br>
   <div>
     <p>test omgeving</p>
@@ -38,6 +35,16 @@
     <button>maak bestand aan</button>
   </div>
 
+
+  <div class="div-1">
+    <p>maake een nieuwe omgeving aan</p>
+    <input type="text" name="" id="">
+    <button> <a href="/omgevingen">nieuwe omgeving</a></button>
+  </div>
+  {%for result in app%}
+  <p>naam:{{result.naam}}</p>
+  <p>ip{{result.ip}}</p>
+  {%endfor%}
   <table>
     <thead>
 
