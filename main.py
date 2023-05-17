@@ -67,11 +67,18 @@ def login():
     username = request.form.get("username")
     password = request.form.get("password")
     if request.method == "POST":
-        if username == users(username=username, password=password):
-            return render_template("index.html")
+        if validate_user(username, password):
+            return render_template("app1.html")
         else:
-            "you are no user"
-    return render_template("login.html", username=username, password=password)
+            return render_template("login.html")
+    return "ERROR"
+
+
+def validate_user(username, password):
+    if username == users.username and password == users.password:
+        return True
+    else:
+        return False
 
 
 @app.route("/index")
