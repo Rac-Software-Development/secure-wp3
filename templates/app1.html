@@ -21,7 +21,12 @@
     {% for applicatie in applicaties %}
     <li>{{ applicatie }}</li>
     {% endfor %}
+    <h3>omgeving</h3>
+    {% for omgeving in omgevingen %}
+    <li>{{ omgeving }}</li>
+    {% endfor %}
   </ul>
+
   <form method="post" action="/applicaties/<id>">
     <div>
       <label for="naam" class="color">appname:</label>
@@ -42,6 +47,15 @@
     <button>maak bestand aan</button>
   </div>
 
+  <form action="/applicaties/<id>/omgevingen" method="post">
+    <label for="test_omgeving">Test Omgeving:</label>
+    <input type="text" name="test_omgeving" id="test_omgeving" required>
+
+    <label for="productie_omgeving">Productie Omgeving:</label>
+    <input type="text" name="productie_omgeving" id="productie_omgeving" required>
+
+    <button type="submit">Opslaan</button>
+  </form>
 
   <div class="div-1">
     <p>maake een nieuwe omgeving aan</p>

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect
 from flask_sqlalchemy import SQLAlchemy
 import sqlite3
 import json
@@ -31,11 +31,25 @@ class omgevingen(db.Model):
     productie_omgeving = db.Column(db.String(120), nullable=False)
     applicaties_id = db.Column(db.Integer, db.ForeignKey("applicaties.id"))
     applicatie = db.relationship(
-        "Applicaties", backref=db.backref("omgevingen", lazy=True)
+        "applicaties", backref=db.backref("omgevingen", lazy=True)
     )
 
     def __repr__(self):
-        return f"('{self.id}', '{self.test_omgeving}','{self.productie_omgeving}')"
+        return f"('{self.id}', '{self.test_omgeving}','{self.productie_omgeving}', '{self.applicaties_id}')"
+
+
+class bestanden(db.Model):
+    __tablename__ = "bestanden"
+    id = db.Column(db.Integer, primary_key=True)
+    test_omgeving = db.Column(db.String(120), nullable=False)
+    productie_omgeving = db.Column(db.String(120), nullable=False)
+    applicaties_id = db.Column(db.Integer, db.ForeignKey("applicaties.id"))
+    applicatie = db.relationship(
+        "applicaties", backref=db.backref("omgevingen", lazy=True)
+    )
+
+    def __repr__(self):
+        return f"('{self.id}', '{self.test_omgeving}','{self.productie_omgeving}', '{self.applicaties_id}')"
 
 
 @app.route("/")
@@ -87,9 +101,34 @@ def apps(id):
         return render_template("app2.html", naam=naam, ip=ip)
 
 
-@app.route("/omgevingen", methods=["GET", "POST"])
-def omgevingen():
-    return render_template("omgevingen.html")
+@app.route("/applicaties/<id>/omgevingen", methods=["GET", "POST"])
+def saves_omgevingen(id):
+    omgeving = None
+    if request.method == "GET":
+        conn = sqlite3.connect("database.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM omgevingen WHERE id=?", (id,))
+        result = cur.fetchone()
+        if result:
+            omgeving = {
+                "id": result[0],
+                "testomgeving": result[1],
+                "productieomgeving": result[2],
+            }
+            return render_template("app1.html", omgeving=omgeving)
+        else:
+            return render_template("app1.html", omgeving=omgeving)
+
+    if request.method == "POST":
+        test_omgeving = request.form.get("test_omgeving")
+        productie_omgeving = request.form.get("productie_omgeving")
+
+        new_omgeving = omgevingen(
+            test_omgeving=test_omgeving, productie_omgeving=productie_omgeving
+        )
+        db.session.add(new_omgeving)
+        db.session.commit()
+        return redirect("/index")
 
 
 if __name__ == "__main__":
