@@ -41,15 +41,14 @@ class omgevingen(db.Model):
 class bestanden(db.Model):
     __tablename__ = "bestanden"
     id = db.Column(db.Integer, primary_key=True)
-    test_omgeving = db.Column(db.String(120), nullable=False)
-    productie_omgeving = db.Column(db.String(120), nullable=False)
-    applicaties_id = db.Column(db.Integer, db.ForeignKey("applicaties.id"))
-    applicatie = db.relationship(
-        "applicaties", backref=db.backref("omgevingen", lazy=True)
+    bestand = db.Column(db.String(120), nullable=False)
+    omgevingen_id = db.Column(db.Integer, db.ForeignKey("omgevingen.id"))
+    omgevingen = db.relationship(
+        "omgevingen", backref=db.backref("bestanden", lazy=True)
     )
 
     def __repr__(self):
-        return f"('{self.id}', '{self.test_omgeving}','{self.productie_omgeving}', '{self.applicaties_id}')"
+        return f"('{self.id}', '{self.bestand}','{self.omgevingen_id}')"
 
 
 @app.route("/")
@@ -129,6 +128,11 @@ def saves_omgevingen(id):
         db.session.add(new_omgeving)
         db.session.commit()
         return redirect("/index")
+
+
+@app.route("/application/<id>/omgevingen/<omgeving_id>")
+def open_bestand(id, omgeving_id):
+    return render_template("bestand.html")
 
 
 if __name__ == "__main__":
