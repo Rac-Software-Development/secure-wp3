@@ -54,16 +54,49 @@ class bestanden(db.Model):
 @app.route("/")
 @app.route("/index")
 def index():
-    conn = sqlite3.connect("database.db")
-    cur = conn.cursor()
-    cur.execute("SELECT * FROM applicaties")
-    applicaties = cur.fetchall()
-    return render_template("app1.html", applicaties=applicaties)
+    return render_template("app1.html")
 
 
 @app.route("/testcorrect")
 def testCorrect():
     return render_template("testcorrect.html")
+
+
+@app.route("/applicaties", methods=["POST", "GET"])
+def scherm_applicaties():
+    if request.method == "GET":
+        conn = sqlite3.connect("database.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM applicaties")
+        applications = cur.fetchall()
+        conn = sqlite3.connect("database.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM omgevingen")
+        omgevingen = cur.fetchall()
+        conn = sqlite3.connect("database.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM bestanden")
+        bestanden = cur.fetchall()
+        return render_template(
+            "applicaties.html",
+            applications=applications,
+            omgevingen=omgevingen,
+            bestanden=bestanden,
+        )
+    if request.method == "POST":
+        naam = request.form.get("naam")
+        ip = request.form.get("ip")
+
+        new_app = applicaties(naam=naam, ip=ip)
+
+        db.session.add(new_app)
+
+        db.session.commit()
+
+        return render_template("applicaties.html", naam=naam, ip=ip)
+
+    else:
+        return render_template("applicaties.html", naam=naam, ip=ip)
 
 
 @app.route("/pygame")
@@ -80,24 +113,24 @@ def apps(id):
         result = cur.fetchone()
         if result:
             app = {"id": result[0], "naam": result[1], "ip": result[2]}
-            return render_template("applicaties.html", app=app)
+            return render_template("applicatie.html", app=app)
         else:
-            return render_template("applicaties.html", app=app)
+            return render_template("applicatie.html", app=app)
 
-    if request.method == "POST":
-        naam = request.form.get("naam")
-        ip = request.form.get("ip")
+    # if request.method == "POST":
+    #     naam = request.form.get("naam")
+    #     ip = request.form.get("ip")
 
-        new_app = applicaties(naam=naam, ip=ip)
+    #     new_app = applicaties(naam=naam, ip=ip)
 
-        db.session.add(new_app)
+    #     db.session.add(new_app)
 
-        db.session.commit()
+    #     db.session.commit()
 
-        return render_template("app2.html", naam=naam, ip=ip)
+    #     return render_template("app2.html", naam=naam, ip=ip)
 
-    else:
-        return render_template("app2.html", naam=naam, ip=ip)
+    # else:
+    #     return render_template("app2.html", naam=naam, ip=ip)
 
 
 @app.route("/applicaties/<id>/omgevingen", methods=["GET", "POST"])
@@ -130,9 +163,31 @@ def saves_omgevingen(id):
         return redirect("/index")
 
 
-@app.route("/application/<id>/omgevingen/<omgeving_id>")
-def open_bestand(id, omgeving_id):
-    return render_template("bestand.html")
+@app.route("/application/<id>/omgevingen/<omgevingen_id>", methods=["GET", "POST"])
+def open_bestand(id, omgevingen_id):
+    bestand = None
+    if request.method == "GET":
+        conn = sqlite3.connect("database.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM bestanden WHERE id =?", (id,))
+        result = cur.fetchone()
+        if result:
+            bestand = {
+                "id": result[0],
+                "bestand": result[1],
+                "omgevingen_id": result[2],
+            }
+            return render_template("bestand.html", bestand=bestand)
+        else:
+            return render_template("bestand.html", bestand=bestand)
+    if request.method == "POST":
+        id = request.form.get("id")
+        omgevingen_id = request.form.get("omgevingen_id")
+        bestand = request.form.get("bestand")
+        nieuw_bestand = bestanden(id=id, omgevingen_id=omgevingen_id, bestand=bestand)
+        db.session.add(nieuw_bestand)
+        db.session.commit()
+        return redirect("/index")
 
 
 if __name__ == "__main__":

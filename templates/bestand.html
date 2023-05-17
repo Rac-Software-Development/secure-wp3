@@ -15,8 +15,25 @@
   <h4>Applicatie: MijnTestApplicatie</h4>
   <h4>Omgeving: Test</h4>
   <h4>Bestandsnaam: database_instellingen.json</h4>
-  <textarea name="" id="" cols="15" rows="10"></textarea>
-
+  <form method="post" action="/application/<id>/omgevingen/<omgevingen_id>">
+    <div>
+      <label for="id" class="color">applicatie:</label>
+      <input type="text" id="id" name="id" required>
+    </div>
+    <div>
+      <label for="omgevingen_id">omgeving:</label>
+      <input type="text" id="omgevingen_id" name="omgevingen_id" required>
+    </div>
+    <div>
+      <label for="bestand">bestand:</label>
+      <input type="text" id="bestand" name="bestand" required>
+    </div>
+    <button type="submit">save</button>
+  </form>
+  <h3>bestanden</h3>
+  {%for result in bestanden%}
+  <li>{{result}}</li>
+  {%endfor%}
 </body>
 
 </html>

@@ -124,35 +124,9 @@
     }
   </style>
   <h1>Applicatie:</h1>
-  <ul class="ul1">
-    <h3>applicaties</h3>
-    {% for applicatie in applications %}
-    <li>{{ applicatie }}</li>
-    {% endfor %}
-    <h3>omgeving</h3>
-    {% for omgeving in omgevingen %}
-    <li>{{ omgeving }}</li>
-    {% endfor %}
-    {%for result in bestand%}
-    <li>{{result}}</li>
-    {%endfor%}
-    <h3>bestanden</h3>
-    {%for result in bestanden%}
-    <li>{{result}}</li>
-    {%endfor%}
-  </ul>
-
-  <form method="post" action="/applicaties">
-    <div>
-      <label for="naam" class="color">appname:</label>
-      <input type="text" id="naam" name="naam" required>
-    </div>
-    <div>
-      <label for="ip">ip:</label>
-      <input type="text" id="ip" name="ip" required>
-    </div>
-    <button type="submit">save</button>
-  </form>
+  {% for key, value in app.items() %}
+  <li><strong>{{ key }}:</strong> {{ value }}</li>
+  {% endfor %}
 </body>
 
 </html>

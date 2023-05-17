@@ -14,32 +14,13 @@
 
 <body>
   <h1>dit is mijn app</h1>
-  <h2>voeg app toe</h2>
 
-  <ul class="ul1">
-    <h3>applicaties</h3>
-    {% for applicatie in applicaties %}
-    <li>{{ applicatie }}</li>
-    {% endfor %}
-    <h3>omgeving</h3>
-    {% for omgeving in omgevingen %}
-    <li>{{ omgeving }}</li>
-    {% endfor %}
-  </ul>
 
-  <form method="post" action="/applicaties/<id>">
-    <div>
-      <label for="naam" class="color">appname:</label>
-      <input type="text" id="naam" name="naam" required>
-    </div>
-    <div>
-      <label for="ip">ip:</label>
-      <input type="text" id="ip" name="ip" required>
-    </div>
-    <button type="submit">save</button>
-  </form>
 
-  <br>
+
+
+
+
   <div>
     <p>test omgeving</p>
     <button>maak bestand aan</button>
