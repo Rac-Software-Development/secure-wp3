@@ -51,7 +51,29 @@ class bestanden(db.Model):
         return f"('{self.id}', '{self.bestand}','{self.omgevingen_id}')"
 
 
+class users(db.Model):
+    __tablename__ = "users"
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(120), nullable=False)
+    password = db.Column(db.String(120), nullable=False)
+
+    def __repr__(self):
+        return f"('{self.id}', '{self.username}','{self.password}')"
+
+
 @app.route("/")
+@app.route("/login", methods=["POST", "GET"])
+def login():
+    username = request.form.get("username")
+    password = request.form.get("password")
+    if request.method == "POST":
+        if username == users(username=username, password=password):
+            return render_template("index.html")
+        else:
+            "you are no user"
+    return render_template("login.html", username=username, password=password)
+
+
 @app.route("/index")
 def index():
     return render_template("app1.html")
