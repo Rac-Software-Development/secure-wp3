@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, jsonify, redirect
 from flask_sqlalchemy import SQLAlchemy
 import sqlite3
 import json
+from sqlalchemy.dialects.postgresql import UUID
+import uuid
 
 app = Flask(__name__)
 app.app_context().push()
@@ -40,7 +42,7 @@ class omgevingen(db.Model):
 
 class bestanden(db.Model):
     __tablename__ = "bestanden"
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.String, primary_key=True, default=str(uuid.uuid4()))
     bestand = db.Column(db.String(120), nullable=False)
     omgevingen_id = db.Column(db.Integer, db.ForeignKey("omgevingen.id"))
     omgevingen = db.relationship(
@@ -68,14 +70,15 @@ def login():
     password = request.form.get("password")
     if request.method == "POST":
         if validate_user(username, password):
-            return render_template("app1.html")
+            return redirect("/applicaties")
         else:
             return render_template("login.html")
-    return "ERROR"
+    return render_template("login.html")
 
 
 def validate_user(username, password):
-    if username == users.username and password == users.password:
+    user = users.query.filter_by(username=username, password=password).first()
+    if user:
         return True
     else:
         return False
