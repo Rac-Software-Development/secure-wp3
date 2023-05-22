@@ -4,6 +4,7 @@ import sqlite3
 import json
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
+import os
 
 app = Flask(__name__)
 app.app_context().push()
@@ -42,9 +43,10 @@ class omgevingen(db.Model):
 
 class bestanden(db.Model):
     __tablename__ = "bestanden"
-    id = db.Column(db.String, primary_key=True, default=str(uuid.uuid4()))
+    id = db.Column(db.Integer, primary_key=True)
     bestand = db.Column(db.String(120), nullable=False)
     omgevingen_id = db.Column(db.Integer, db.ForeignKey("omgevingen.id"))
+    uuid = db.Column(db.String(36), unique=True, default=str(uuid.uuid4()))
     omgevingen = db.relationship(
         "omgevingen", backref=db.backref("bestanden", lazy=True)
     )
@@ -195,7 +197,7 @@ def saves_omgevingen(id):
         return redirect("/index")
 
 
-@app.route("/application/<id>/omgevingen/<omgevingen_id>", methods=["GET", "POST"])
+@app.route("/applicaties/<id>/omgevingen/<omgevingen_id>", methods=["GET", "POST"])
 def open_bestand(id, omgevingen_id):
     bestand = None
     if request.method == "GET":
@@ -220,6 +222,23 @@ def open_bestand(id, omgevingen_id):
         db.session.add(nieuw_bestand)
         db.session.commit()
         return redirect("/index")
+
+
+# @app.route(
+#     "/api/download/<applicatie id>/<omgeving id>/<bestand uuid>",
+#     methods=["GET", "POST"],
+# )
+# def download_bestand(applicatie):
+#     if request.method == "POST":
+#         test_omgeving = request.form.get("test_omgeving")
+#         productie_omgeving = request.form.get("productie_omgeving")
+
+
+#         new_omgeving = omgevingen(
+#             test_omgeving=test_omgeving, productie_omgeving=productie_omgeving
+#         )
+#         db.session.add(new_omgeving)
+#         db.session.commit()
 
 
 if __name__ == "__main__":
