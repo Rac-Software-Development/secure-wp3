@@ -29,6 +29,7 @@
       <input type="text" id="bestand" name="bestand" required>
     </div>
     <button type="submit">save</button>
+    <a class="btn btn-success" href="{{url_for('download')}}">Download</a>
   </form>
   <h3>bestanden</h3>
   {%for result in bestanden%}

@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, redirect
+from flask import Flask, render_template, request, jsonify, redirect, send_file
 from flask_sqlalchemy import SQLAlchemy
 import sqlite3
 import json
@@ -239,6 +239,10 @@ def open_bestand(id, omgevingen_id):
 #         )
 #         db.session.add(new_omgeving)
 #         db.session.commit()
+@app.route("/api/download/<applicatie_id>/<omgeving_id>/<bestand_uuid>")
+def download(applicatie_id, bestand_uuid, omgeving_id):
+    path = "instellingen.json"
+    return send_file(path, as_attachment=True)
 
 
 if __name__ == "__main__":
