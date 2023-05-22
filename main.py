@@ -239,6 +239,8 @@ def open_bestand(id, omgevingen_id):
 #         )
 #         db.session.add(new_omgeving)
 #         db.session.commit()
+
+
 @app.route("/api/download/<applicatie_id>/<omgeving_id>/<bestand_uuid>")
 def download(applicatie_id, bestand_uuid, omgeving_id):
     path = "instellingen.json"
