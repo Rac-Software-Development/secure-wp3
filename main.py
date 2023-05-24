@@ -5,6 +5,9 @@ import json
 from sqlalchemy.dialects.postgresql import UUID
 import uuid
 import os
+from flask_ipfilter import IPFilter, Whitelist
+
+import datetime
 
 app = Flask(__name__)
 app.app_context().push()
@@ -14,6 +17,9 @@ app.config[
     "SQLALCHEMY_DATABASE_URI"
 ] = "sqlite:////Users/Nizar/OneDrive - Hogeschool Rotterdam/Bureaublad/wp3 inhaalsopdracht/werkplaats-3---inhaalopdracht-Nizar-1012373/database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+ip_filter = IPFilter(app, ruleset=Whitelist())
+ip_filter.ruleset.permit("127.0.0.1")
+
 db.init_app(app)
 
 
@@ -63,6 +69,19 @@ class users(db.Model):
 
     def __repr__(self):
         return f"('{self.id}', '{self.username}','{self.password}')"
+
+
+class logging(db.Model):
+    __tablename__ = "logging"
+    id = db.Column(db.Integer, primary_key=True)
+    ip = db.Column(db.String(120), nullable=False)
+    omgeving = db.Column(db.String(120), nullable=False)
+    tijdstip = db.Column(db.DateTime())
+
+    melding = db.Column(db.String(120), nullable=False)
+
+    def __repr__(self):
+        return f"('{self.ip}','{self.id}', '{self.omgeving}','{self.tijdstip}',{self.melding})"
 
 
 @app.route("/")
@@ -147,9 +166,10 @@ def apps(id):
         result = cur.fetchone()
         if result:
             app = {"id": result[0], "naam": result[1], "ip": result[2]}
+
             return render_template("applicatie.html", app=app)
-        else:
-            return render_template("applicatie.html", app=app)
+
+    return render_template("applicatie.html", app={})
 
     # if request.method == "POST":
     #     naam = request.form.get("naam")
@@ -243,8 +263,29 @@ def open_bestand(id, omgevingen_id):
 
 @app.route("/api/download/<applicatie_id>/<omgeving_id>/<bestand_uuid>")
 def download(applicatie_id, bestand_uuid, omgeving_id):
-    path = "instellingen.json"
-    return send_file(path, as_attachment=True)
+    if request.access_route[0] == "127.0.0.1":
+        path = "instellingen.json"
+
+        return send_file(path, as_attachment=True)
+    else:
+        return "sorry ip address is not allowed"
+
+
+def logging_succes():
+    ip = logging.query.filter_by(ip=ip).first()
+    omgeving = logging.query.filter_by(omgeving=omgeving).first()
+
+    logging_entry = logging(
+        ip=ip, omgeving=omgeving, tijdstip=datetime.now(), melding="succesvol download"
+    )
+    db.session.add(logging_entry)
+    db.session.commit()
+    return render_template("app1.html", logging_entry=logging_entry)
+
+
+@app.route("/api/logging")
+def api_logging():
+    return
 
 
 if __name__ == "__main__":

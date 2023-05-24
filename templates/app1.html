@@ -43,7 +43,12 @@
     <input type="text" name="" id="">
     <button> <a href="/omgevingen">nieuwe omgeving</a></button>
   </div>
-
+  {%if logging_entry%}
+  <p>{{logging_entry.ip}}</p>
+  <p>{{logging_entry.omgeving}}</p>
+  <p>{{logging_entry.tijdstip}}</p>
+  <p>{{logging_entry.melding}}</p>
+  {%endif%}
   <table>
     <thead>
 

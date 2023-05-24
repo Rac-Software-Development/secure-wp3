@@ -124,9 +124,11 @@
     }
   </style>
   <h1>Applicatie:</h1>
+  {%if app%}
   {% for key, value in app.items() %}
   <li><strong>{{ key }}:</strong> {{ value }}</li>
   {% endfor %}
+  {% endif %}
 </body>
 
 </html>
