@@ -244,8 +244,9 @@ def open_bestand(id, omgevingen_id):
         return redirect("/index")
 
 
-# @app.route("/api/download/<applicatie_id>/<omgeving_id>/<bestand_uuid>")
-# def download(applicatie_id, omgeving_id, bestand_uuid):
+@app.route("/api/download/<applicatie_id>/<omgeving_id>/<bestand_uuid>")
+def download(applicatie_id, omgeving_id, bestand_uuid):
+    return send_file("instellingen.json", as_attachment=True)
 
 
 if __name__ == "__main__":
