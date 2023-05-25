@@ -244,48 +244,8 @@ def open_bestand(id, omgevingen_id):
         return redirect("/index")
 
 
-# @app.route(
-#     "/api/download/<applicatie id>/<omgeving id>/<bestand uuid>",
-#     methods=["GET", "POST"],
-# )
-# def download_bestand(applicatie):
-#     if request.method == "POST":
-#         test_omgeving = request.form.get("test_omgeving")
-#         productie_omgeving = request.form.get("productie_omgeving")
-
-
-#         new_omgeving = omgevingen(
-#             test_omgeving=test_omgeving, productie_omgeving=productie_omgeving
-#         )
-#         db.session.add(new_omgeving)
-#         db.session.commit()
-
-
-@app.route("/api/download/<applicatie_id>/<omgeving_id>/<bestand_uuid>")
-def download(applicatie_id, bestand_uuid, omgeving_id):
-    if request.access_route[0] == "127.0.0.1":
-        path = "instellingen.json"
-
-        return send_file(path, as_attachment=True)
-    else:
-        return "sorry ip address is not allowed"
-
-
-def logging_succes():
-    ip = logging.query.filter_by(ip=ip).first()
-    omgeving = logging.query.filter_by(omgeving=omgeving).first()
-
-    logging_entry = logging(
-        ip=ip, omgeving=omgeving, tijdstip=datetime.now(), melding="succesvol download"
-    )
-    db.session.add(logging_entry)
-    db.session.commit()
-    return render_template("app1.html", logging_entry=logging_entry)
-
-
-@app.route("/api/logging")
-def api_logging():
-    return
+# @app.route("/api/download/<applicatie_id>/<omgeving_id>/<bestand_uuid>")
+# def download(applicatie_id, omgeving_id, bestand_uuid):
 
 
 if __name__ == "__main__":
