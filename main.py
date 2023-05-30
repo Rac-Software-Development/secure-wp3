@@ -246,7 +246,20 @@ def open_bestand(id, omgevingen_id):
 
 @app.route("/api/download/<applicatie_id>/<omgeving_id>/<bestand_uuid>")
 def download(applicatie_id, omgeving_id, bestand_uuid):
-    return send_file("instellingen.json", as_attachment=True)
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT bestand FROM bestanden")
+    data = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    content = "\n".join("\t".join(map(str, row)) for row in data)
+    ip_filter = "127.0.0.1"
+    if ip_filter == "127.0.0.1":
+        with open("bestand.txt", "w") as f:
+            f.write(content)
+        return send_file("bestand.txt", as_attachment=True)
+    else:
+        return "ip is not allowed"
 
 
 if __name__ == "__main__":
