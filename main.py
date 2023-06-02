@@ -33,32 +33,19 @@ class applicaties(db.Model):
         return f"('{self.id}', '{self.naam}','{self.ip}')"
 
 
-class omgevingen(db.Model):
-    __tablename__ = "omgevingen"
-    id = db.Column(db.Integer, primary_key=True)
-    test_omgeving = db.Column(db.String(120), nullable=False)
-    productie_omgeving = db.Column(db.String(120), nullable=False)
-    applicaties_id = db.Column(db.Integer, db.ForeignKey("applicaties.id"))
-    applicatie = db.relationship(
-        "applicaties", backref=db.backref("omgevingen", lazy=True)
-    )
+# class bestanden(db.Model):
+#     __tablename__ = "bestanden"
 
-    def __repr__(self):
-        return f"('{self.id}', '{self.test_omgeving}','{self.productie_omgeving}', '{self.applicaties_id}')"
+#     id = db.Column(db.Integer, primary_key=True)
+#     bestand = db.Column(db.String(120), nullable=False)
+#     omgevingen_id = db.Column(db.Integer, db.ForeignKey("omgevingen.id"))
+#     uuid = db.Column(db.String(36), unique=True, default=str(uuid.uuid4()))
+#     omgevingen = db.relationship(
+#         "omgevingen", backref=db.backref("bestanden", lazy=True)
+#     )
 
-
-class bestanden(db.Model):
-    __tablename__ = "bestanden"
-    id = db.Column(db.Integer, primary_key=True)
-    bestand = db.Column(db.String(120), nullable=False)
-    omgevingen_id = db.Column(db.Integer, db.ForeignKey("omgevingen.id"))
-    uuid = db.Column(db.String(36), unique=True, default=str(uuid.uuid4()))
-    omgevingen = db.relationship(
-        "omgevingen", backref=db.backref("bestanden", lazy=True)
-    )
-
-    def __repr__(self):
-        return f"('{self.id}', '{self.bestand}','{self.omgevingen_id}')"
+#     def __repr__(self):
+#         return f"('{self.id}', '{self.bestand}','{self.omgevingen_id}')"
 
 
 class users(db.Model):
@@ -187,60 +174,83 @@ def apps(id):
     #     return render_template("app2.html", naam=naam, ip=ip)
 
 
-@app.route("/applicaties/<id>/omgevingen", methods=["GET", "POST"])
-def saves_omgevingen(id):
+@app.route("/applicaties/<applicaties_id>/omgevingen", methods=["GET", "POST"])
+def saves_omgevingen(applicaties_id):
     omgeving = None
     if request.method == "GET":
         conn = sqlite3.connect("database.db")
         cur = conn.cursor()
-        cur.execute("SELECT * FROM omgevingen WHERE id=?", (id,))
+        cur.execute(
+            "SELECT * FROM omgevingen WHERE applicaties_id=?", (applicaties_id,)
+        )
         result = cur.fetchone()
         if result:
             omgeving = {
                 "id": result[0],
                 "testomgeving": result[1],
                 "productieomgeving": result[2],
+                "applicaties_id": result[3],
             }
-            return render_template("app1.html", omgeving=omgeving)
+            return render_template("omgevingen.html", omgeving=omgeving)
         else:
-            return render_template("app1.html", omgeving=omgeving)
+            return render_template("omgevingen.html", omgeving={})
 
     if request.method == "POST":
         test_omgeving = request.form.get("test_omgeving")
         productie_omgeving = request.form.get("productie_omgeving")
-
-        new_omgeving = omgevingen(
-            test_omgeving=test_omgeving, productie_omgeving=productie_omgeving
+        applicaties_id = request.form.get("applicaties_id")
+        conn = sqlite3.connect("database.db")
+        cur = conn.cursor()
+        cur.execute("PRAGMA foreign_keys = ON;")
+        cur.execute(
+            " INSERT INTO omgevingen (test_omgeving,productie_omgeving, applicaties_id) VALUES (?,?,?);",
+            (test_omgeving, productie_omgeving, applicaties_id),
         )
-        db.session.add(new_omgeving)
-        db.session.commit()
+
+        cur.fetchone()
+        conn.commit()
+        conn.close()
+
         return redirect("/index")
 
 
-@app.route("/applicaties/<id>/omgevingen/<omgevingen_id>", methods=["GET", "POST"])
-def open_bestand(id, omgevingen_id):
+@app.route(
+    "/applicaties/<applicaties_id>/omgevingen/<omgevingen_id>", methods=["GET", "POST"]
+)
+def open_bestand(applicaties_id, omgevingen_id):
     bestand = None
     if request.method == "GET":
         conn = sqlite3.connect("database.db")
         cur = conn.cursor()
-        cur.execute("SELECT * FROM bestanden WHERE id =?", (id,))
+        cur.execute(
+            "SELECT * FROM bestanden WHERE applicaties_id =?", (applicaties_id,)
+        )
         result = cur.fetchone()
         if result:
             bestand = {
-                "id": result[0],
-                "bestand": result[1],
+                "applicaties_id": result[0],
+                "bestandnaam": result[1],
                 "omgevingen_id": result[2],
             }
             return render_template("bestand.html", bestand=bestand)
         else:
             return render_template("bestand.html", bestand=bestand)
+
     if request.method == "POST":
-        id = request.form.get("id")
+        bestandnaam = request.form.get("bestandnaam")
         omgevingen_id = request.form.get("omgevingen_id")
-        bestand = request.form.get("bestand")
-        nieuw_bestand = bestanden(id=id, omgevingen_id=omgevingen_id, bestand=bestand)
-        db.session.add(nieuw_bestand)
-        db.session.commit()
+        applicaties_id = request.form.get("applicaties_id")
+        conn = sqlite3.connect("database.db")
+        cur = conn.cursor()
+        cur.execute("PRAGMA foreign_keys = ON;")
+        cur.execute(
+            " INSERT INTO bestanden (bestandnaam,omgevingen_id,applicaties_id) VALUES (?,?,?);",
+            (bestandnaam, omgevingen_id, applicaties_id),
+        )
+
+        cur.fetchone()
+        conn.commit()
+        conn.close()
         return redirect("/index")
 
 
@@ -252,14 +262,15 @@ def download(applicatie_id, omgeving_id, bestand_uuid):
     data = cursor.fetchall()
     cursor.close()
     conn.close()
-    content = "\n".join("\t".join(map(str, row)) for row in data)
-    ip_filter = "127.0.0.1"
-    if ip_filter == "127.0.0.1":
-        with open("bestand.txt", "w") as f:
-            f.write(content)
-        return send_file("bestand.txt", as_attachment=True)
-    else:
-        return "ip is not allowed"
+    for row in data:
+        rows = "\n".join("\t".join(map(str, row)))
+        ip_filter = "127.0.0.1"
+        if ip_filter == "127.0.0.1":
+            with open("bestand.txt", "w") as f:
+                f.write(rows)
+            return send_file("bestand.txt", as_attachment=True)
+        else:
+            return "ip is not allowed"
 
 
 if __name__ == "__main__":

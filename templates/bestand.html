@@ -15,18 +15,18 @@
   <h4>Applicatie: MijnTestApplicatie</h4>
   <h4>Omgeving: Test</h4>
   <h4>Bestandsnaam: database_instellingen.json</h4>
-  <form method="post" action="/applicaties/<id>/omgevingen/<omgevingen_id>">
+  <form method="post" action="/applicaties/<applicaties_id>/omgevingen/<omgevingen_id>">
     <div>
-      <label for="id" class="color">applicatie:</label>
-      <input type="text" id="id" name="id" required>
+      <label for="applicaties_id" class="color">applicatie:</label>
+      <input type="text" id="applicaties_id" name="applicaties_id" required>
     </div>
     <div>
       <label for="omgevingen_id">omgeving:</label>
       <input type="text" id="omgevingen_id" name="omgevingen_id" required>
     </div>
     <div>
-      <label for="bestand">bestand:</label>
-      <input type="text" id="bestand" name="bestand" required>
+      <label for="bestandnaam">bestand:</label>
+      <input type="text" id="bestandnaam" name="bestandnaam" required>
     </div>
     <button type="submit">save</button>
     <a class="btn btn-success" href="/api/download/<applicatie_id>/<omgeving_id>/<bestand_uuid>">Download</a>

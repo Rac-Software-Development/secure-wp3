@@ -11,22 +11,24 @@
 </head>
 
 <body>
-  <form method="post" action="/omgevingen">
-    <div>
-      <label for="testomgeving" class="color">testomgeving:</label>
-      <input type="text" id="test_omgeving" name="test_omgeving" required>
-    </div>
-    <div>
-      <label for="productie_omgeving">productie omgeving:</label>
-      <input type="text" id="productie_omgeving" name="productie_omgeving" required>
-    </div>
-    <button type="submit">save</button>
+  <form action="/applicaties/<id>/omgevingen" method="post">
+    <label for="test_omgeving">Test Omgeving:</label>
+    <input type="text" name="test_omgeving" id="test_omgeving" required>
+
+    <label for="productie_omgeving">Productie Omgeving:</label>
+    <input type="text" name="productie_omgeving" id="productie_omgeving" required>
+
+    <label for="applicaties_id">Applicatie:</label>
+    <input type="text" name="applicaties_id" id="applicaties_id" required>
+    <button type="submit">Opslaan</button>
   </form>
   <h1>lijst met omgevingen</h1>
   <li>
-    {% for new_omgeving in omgevingen %}
-    <p>{{new_omgeving}}</p>
-    {%endfor%}
+    {%if omgeving%}
+    {% for key, value in omgeving.items() %}
+  <li><strong>{{ key }}:</strong> {{ value }}</li>
+  {% endfor %}
+  {% endif %}
   </li>
 </body>
 
