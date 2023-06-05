@@ -258,7 +258,7 @@ def open_bestand(applicaties_id, omgevingen_id):
 def download(applicatie_id, omgeving_id, bestand_uuid):
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT bestand FROM bestanden")
+    cursor.execute("SELECT bestandnaam FROM bestanden")
     data = cursor.fetchall()
     cursor.close()
     conn.close()
@@ -271,6 +271,15 @@ def download(applicatie_id, omgeving_id, bestand_uuid):
             return send_file("bestand.txt", as_attachment=True)
         else:
             return "ip is not allowed"
+
+
+@app.route("/api/logging")
+def api_logging():
+    conn = sqlite3.connect("database.db")
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM logging")
+    log = cursor.fetchall()
+    return {"logging": log}
 
 
 if __name__ == "__main__":
