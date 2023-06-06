@@ -10,7 +10,7 @@
   <link rel="stylesheet" href="static/style.css">
 
 </head>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
 
 <body>
   <h1>dit is mijn app</h1>
@@ -45,30 +45,43 @@
     <input type="text" name="" id="">
     <button> <a href="/omgevingen">nieuwe omgeving</a></button>
   </div>
-  {%if logging_entry%}
-  <p>{{logging_entry.ip}}</p>
-  <p>{{logging_entry.omgeving}}</p>
-  <p>{{logging_entry.tijdstip}}</p>
-  <p>{{logging_entry.melding}}</p>
-  {%endif%}
+
   <table>
     <thead>
-
+      <th>id</th>
       <th>ip</th>
       <th>omgeving</th>
       <th>tijdstip</th>
       <th>melding</th>
-
     </thead>
     <tbody>
-
-      <td>127.001:5000</td>
-      <td>test</td>
-      <td>18:38 14-05-2023</td>
-      <td>download bestand oke.db</td>
-
+      <td id="li"></td>
     </tbody>
   </table>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+  <script lang="javascript">
+    $(document).ready(function () {
+      $.ajax({
+        url: "http://127.0.0.1:5000/api/logging",
+        dataType: "json",
+        method: "GET",
+        success: function (data) {
+          var text = ""
+          for (var i = 0; i < data.length; i++) {
+            text += data[i].id + data[i].ip + data[i].omgeving + data[i].tijdstip + data[i].melding + "<br>"
+          }
+
+          $("#li").append(text);
+
+          console.log(data);
+        },
+        error: function (xhr, status, errorthrown) {
+          console.log("ERROR: " + errorthrown);
+        }
+      })
+    });
+  </script>
+
 </body>
 
 </html>

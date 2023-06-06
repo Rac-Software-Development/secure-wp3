@@ -77,14 +77,14 @@ def login():
     username = request.form.get("username")
     password = request.form.get("password")
     if request.method == "POST":
-        if validate_user(username, password):
+        if user(username, password):
             return redirect("/applicaties")
         else:
             return render_template("login.html")
     return render_template("login.html")
 
 
-def validate_user(username, password):
+def user(username, password):
     user = users.query.filter_by(username=username, password=password).first()
     if user:
         return True
@@ -277,9 +277,25 @@ def download(applicatie_id, omgeving_id, bestand_uuid):
 def api_logging():
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM logging")
-    log = cursor.fetchall()
-    return {"logging": log}
+    cursor.execute("SELECT id FROM logging")
+    id = cursor.fetchall()
+    cursor.execute("SELECT ip FROM logging")
+    ip = cursor.fetchall()
+    cursor.execute("SELECT omgeving FROM logging")
+    omgeving = cursor.fetchall()
+    cursor.execute("SELECT tijdstip FROM logging")
+    tijdstip = cursor.fetchall()
+    cursor.execute("SELECT melding FROM logging")
+    melding = cursor.fetchall()
+    return [
+        {
+            "id": id,
+            "ip": ip,
+            "omgeving": omgeving,
+            "tijdstip": tijdstip,
+            "melding": melding,
+        }
+    ]
 
 
 if __name__ == "__main__":
