@@ -55,7 +55,11 @@
       <th>melding</th>
     </thead>
     <tbody>
-      <td id="li"></td>
+      <td id="id"></td>
+      <td id="ip"></td>
+      <td id="omg"></td>
+      <td id="tijd"></td>
+      <td id="meld"></td>
     </tbody>
   </table>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
@@ -68,12 +72,35 @@
         success: function (data) {
           var text = ""
           for (var i = 0; i < data.length; i++) {
-            text += data[i].id + data[i].ip + data[i].omgeving + data[i].tijdstip + data[i].melding + "<br>"
+            text += data[i].id + "<br>"
           }
 
-          $("#li").append(text);
-
+          $("#id").append(text);
+          var text2 = ""
+          for (var i = 0; i < data.length; i++) {
+            text2 += data[i].ip + "<br>"
+          }
+          $("#ip").append(text2);
+          var text3 = ""
+          for (var i = 0; i < data.length; i++) {
+            text3 += data[i].omgeving + "<br>"
+          }
+          $("#omg").append(text3);
+          var text4 = ""
+          for (var i = 0; i < data.length; i++) {
+            text4 += data[i].tijdstip + "<br>"
+          }
+          $("#tijd").append(text4);
+          var text5 = ""
+          for (var i = 0; i < data.length; i++) {
+            text5 += data[i].melding + "<br>"
+          }
+          $("#meld").append(text5);
           console.log(data);
+
+        },
+        complete: function () {
+          setInterval(sendRequest, 1000)
         },
         error: function (xhr, status, errorthrown) {
           console.log("ERROR: " + errorthrown);
