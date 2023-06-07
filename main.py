@@ -273,29 +273,37 @@ def download(applicatie_id, omgeving_id, bestand_uuid):
             return "ip is not allowed"
 
 
-@app.route("/api/logging")
+@app.route("/api/logging", methods=["GET", "POST"])
 def api_logging():
-    conn = sqlite3.connect("database.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT id FROM logging")
-    id = cursor.fetchall()
-    cursor.execute("SELECT ip FROM logging")
-    ip = cursor.fetchall()
-    cursor.execute("SELECT omgeving FROM logging")
-    omgeving = cursor.fetchall()
-    cursor.execute("SELECT tijdstip FROM logging")
-    tijdstip = cursor.fetchall()
-    cursor.execute("SELECT melding FROM logging")
-    melding = cursor.fetchall()
-    return [
-        {
-            "id": id,
-            "ip": ip,
-            "omgeving": omgeving,
-            "tijdstip": tijdstip,
-            "melding": melding,
-        }
-    ]
+    if request.method == "GET":
+        conn = sqlite3.connect("database.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM logging")
+        id = cursor.fetchall()
+        cursor.execute("SELECT ip FROM logging")
+        ip = cursor.fetchall()
+        cursor.execute("SELECT omgeving FROM logging")
+        omgeving = cursor.fetchall()
+        cursor.execute("SELECT tijdstip FROM logging")
+        tijdstip = cursor.fetchall()
+        cursor.execute("SELECT melding FROM logging")
+        melding = cursor.fetchall()
+        return [
+            {
+                "id": id,
+                "ip": ip,
+                "omgeving": omgeving,
+                "tijdstip": tijdstip,
+                "melding": melding,
+            }
+        ]
+    if request.method == "POST":
+        return request.form
+
+
+@app.route("/a")
+def a():
+    return render_template("a.html")
 
 
 if __name__ == "__main__":
