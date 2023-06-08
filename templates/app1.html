@@ -7,7 +7,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <!-- <link rel="stylesheet" href="static/style.css"> -->
+  <link rel="stylesheet" href="static/style.css">
 
 </head>
 
@@ -59,11 +59,11 @@
     </tbody>
   </table>
 
-  <button onclick="button()">button</button>
+  <button style="width: auto;" onclick="button()">button</button>
   <p id="p"></p>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
   <script lang="javascript">
-    $(document).ready(function () {
+    $(document).ready(function dragon() {
       $.ajax({
         url: "http://127.0.0.1:5000/api/logging",
         dataType: "json",
@@ -110,13 +110,38 @@
       $.ajax({
         cache: false,
         url: "http://127.0.0.1:5000/api/logging",
-        data: { "niks": "fsdfsdfs" },
         method: "POST",
         dataType: "json",
 
         success: function (data) {
-          $("#p").append(JSON.stringify(data));
+          var text = ""
+          for (var i = 0; i < data.length; i++) {
+            text += data[i].id + "<br>"
+          }
+
+          $("#id").append(text);
+          var text2 = ""
+          for (var i = 0; i < data.length; i++) {
+            text2 += data[i].ip + "<br>"
+          }
+          $("#ip").append(text2);
+          var text3 = ""
+          for (var i = 0; i < data.length; i++) {
+            text3 += data[i].omgeving + "<br>"
+          }
+          $("#omg").append(text3);
+          var text4 = ""
+          for (var i = 0; i < data.length; i++) {
+            text4 += data[i].tijdstip + "<br>"
+          }
+          $("#tijd").append(text4);
+          var text5 = ""
+          for (var i = 0; i < data.length; i++) {
+            text5 += data[i].melding + "<br>"
+          }
+          $("#meld").append(text5);
           console.log(data);
+
         },
         error: function (xhr, status, errorthrown) {
           console.log("ERROR: " + errorthrown);

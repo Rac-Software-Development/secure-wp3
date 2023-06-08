@@ -298,7 +298,27 @@ def api_logging():
             }
         ]
     if request.method == "POST":
-        return request.form
+        conn = sqlite3.connect("database.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM logging")
+        id = cursor.fetchall()
+        cursor.execute("SELECT ip FROM logging")
+        ip = cursor.fetchall()
+        cursor.execute("SELECT omgeving FROM logging")
+        omgeving = cursor.fetchall()
+        cursor.execute("SELECT tijdstip FROM logging")
+        tijdstip = cursor.fetchall()
+        cursor.execute("SELECT melding FROM logging")
+        melding = cursor.fetchall()
+        return [
+            {
+                "id": id,
+                "ip": ip,
+                "omgeving": omgeving,
+                "tijdstip": tijdstip,
+                "melding": melding,
+            }
+        ]
 
 
 @app.route("/a")

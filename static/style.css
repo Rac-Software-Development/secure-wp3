@@ -9,7 +9,6 @@
   right: 0;
 }
 
-
 .o-container {
   width: 100%;
   -webkit-flex-grow: 1;
@@ -38,18 +37,14 @@ stylesheet voor user-agents div {
   background-color: #fff1ea;
 }
 
-.button {
-  width: 22px;
-}
-
 body {
   font-size: 1.6rem;
   font-weight: 500;
   line-height: 1.38;
   background-color: #7095d5;
   word-break: normal;
-  display: -webkit-flex;
-  display: flex;
+
+
   -webkit-flex-direction: column;
   flex-direction: column;
   -webkit-flex-basis: 100%;
