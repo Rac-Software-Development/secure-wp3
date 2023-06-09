@@ -145,7 +145,11 @@
         },
         error: function (xhr, status, errorthrown) {
           console.log("ERROR: " + errorthrown);
+        },
+        complete: function () {
+          setInterval(success, 1000)
         }
+
 
       })
     }
@@ -153,5 +157,6 @@
   </script>
 
 </body>
+
 
 </html>
