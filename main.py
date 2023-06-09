@@ -102,6 +102,19 @@ def testCorrect():
     return render_template("testcorrect.html")
 
 
+ip_filter = IPFilter(app, ruleset=Whitelist())
+
+ip_filter.ruleset.permit("127.0.0.1")
+
+
+@app.route("/")
+def route_test():
+    if ip_filter == "127.0.0.1":
+        return "Allowed"
+    else:
+        "Not allowed"
+
+
 @app.route("/applicaties", methods=["POST", "GET"])
 def scherm_applicaties():
     if request.method == "GET":
@@ -254,23 +267,28 @@ def open_bestand(applicaties_id, omgevingen_id):
         return redirect("/index")
 
 
-@app.route("/api/download/<applicatie_id>/<omgeving_id>/<bestand_uuid>")
-def download(applicatie_id, omgeving_id, bestand_uuid):
+@app.route("/api/download/<applicatie_id>/<omgevingen_id>/<bestand_uuid>")
+def download(applicatie_id, omgevingen_id, bestand_uuid):
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
     cursor.execute("SELECT bestandnaam FROM bestanden")
-    data = cursor.fetchall()
+    bestandnaam = cursor.fetchall()
+    cursor.execute("SELECT id FROM omgevingen WHERE id=?", (omgevingen_id,))
+    omgeving = cursor.fetchall()
+    cursor.execute("SELECT ip FROM applicaties Where id=?", (applicatie_id,))
+    ip = cursor.fetchone()
     cursor.close()
     conn.close()
-    for row in data:
-        rows = "\n".join("\t".join(map(str, row)))
-        ip_filter = "127.0.0.1"
-        if ip_filter == "127.0.0.1":
-            with open("bestand.txt", "w") as f:
-                f.write(rows)
-            return send_file("bestand.txt", as_attachment=True)
-        else:
-            return "ip is not allowed"
+    data3 = {"ip": ip, "bestand": bestandnaam, "omgeving": omgeving}
+
+    if ip == "127.0.0.1":
+        with open("bestand.txt", "w") as f:
+            f.write(str(data3["bestand"]))
+        return send_file("bestand.txt", as_attachment=True)
+    else:
+        with open("bestand.txt", "w") as f:
+            f.write(str(data3["bestand"]))
+        return send_file("bestand.txt", as_attachment=True)
 
 
 @app.route("/api/logging", methods=["GET", "POST"])
