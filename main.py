@@ -15,7 +15,7 @@ db = SQLAlchemy()
 app.config["SECRET_KEY"] = "NIZAR"
 app.config[
     "SQLALCHEMY_DATABASE_URI"
-] = "sqlite:////Users/Nizar/OneDrive - Hogeschool Rotterdam/Bureaublad/wp3 inhaalsopdracht/werkplaats-3---inhaalopdracht-Nizar-1012373/database.db"
+] = "sqlite:////Users/Nizar/herkansing-security-Nizar1012373/werkplaats-3---inhaalopdracht-Nizar-1012373/database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 ip_filter = IPFilter(app, ruleset=Whitelist())
 ip_filter.ruleset.permit("127.0.0.1")
@@ -121,7 +121,7 @@ def scherm_applicaties():
         conn = sqlite3.connect("database.db")
         cur = conn.cursor()
         cur.execute("SELECT * FROM applicaties")
-        applications = cur.fetchall()
+        applicaties = cur.fetchall()
         conn = sqlite3.connect("database.db")
         cur = conn.cursor()
         cur.execute("SELECT * FROM omgevingen")
@@ -132,7 +132,7 @@ def scherm_applicaties():
         bestanden = cur.fetchall()
         return render_template(
             "applicaties.html",
-            applications=applications,
+            applicaties=applicaties,
             omgevingen=omgevingen,
             bestanden=bestanden,
         )
