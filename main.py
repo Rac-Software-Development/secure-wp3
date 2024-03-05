@@ -9,6 +9,7 @@ from flask_ipfilter import IPFilter, Whitelist
 
 import datetime
 
+
 app = Flask(__name__)
 app.app_context().push()
 db = SQLAlchemy()
