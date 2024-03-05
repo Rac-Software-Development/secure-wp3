@@ -13,9 +13,7 @@ app = Flask(__name__)
 app.app_context().push()
 db = SQLAlchemy()
 app.config["SECRET_KEY"] = "NIZAR"
-app.config[
-    "SQLALCHEMY_DATABASE_URI"
-] = "sqlite:////Users/Nizar/herkansing-security-Nizar1012373/werkplaats-3---inhaalopdracht-Nizar-1012373/database.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 ip_filter = IPFilter(app, ruleset=Whitelist())
 ip_filter.ruleset.permit("127.0.0.1")
@@ -346,4 +344,4 @@ def a():
 
 if __name__ == "__main__":
     db.create_all()
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")
