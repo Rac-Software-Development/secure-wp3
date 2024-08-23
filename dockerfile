@@ -22,4 +22,4 @@ RUN pip install Werkzeug
 COPY . .
 
 CMD [ "python", "./main.py"]
-EXPOSE 5000
+EXPOSE 80
