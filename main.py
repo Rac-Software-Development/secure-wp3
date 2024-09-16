@@ -6,7 +6,8 @@ from sqlalchemy.dialects.postgresql import UUID
 import uuid
 import os
 from flask_ipfilter import IPFilter, Whitelist
-
+from cryptography.fernet import Fernet
+from sqlalchemy_utils import EncryptedType, StringEncryptedType
 import datetime
 
 
@@ -14,12 +15,17 @@ app = Flask(__name__)
 app.app_context().push()
 db = SQLAlchemy()
 app.config["SECRET_KEY"] = "NIZAR"
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = (
+    "sqlite:////Users/Nizar/OneDrive - Hogeschool Rotterdam/SecureWP3/database.db"
+)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 ip_filter = IPFilter(app, ruleset=Whitelist())
 ip_filter.ruleset.permit("127.0.0.1")
 
 db.init_app(app)
+# hier maak ik de encypted key
+key = Fernet.generate_key()
+fernet = Fernet(key)
 
 
 class applicaties(db.Model):
@@ -43,8 +49,21 @@ class applicaties(db.Model):
 #         "omgevingen", backref=db.backref("bestanden", lazy=True)
 #     )
 
+
 #     def __repr__(self):
 #         return f"('{self.id}', '{self.bestand}','{self.omgevingen_id}')"
+class register(db.Model):
+    __tablename__ = "register"
+    id = db.Column(db.Integer, primary_key=True)
+    u_name = db.Column((db.String(120)), nullable=False)
+    pass_word = db.Column((db.String(120)), nullable=False)
+
+    def __init__(self, u_name, pass_word):
+
+        self.u_name = fernet.encrypt(u_name.encode("utf-8")).decode("utf-8")
+        self.pass_word = fernet.encrypt(pass_word.encode("utf-8")).decode("utf-8")
+        print(self.u_name, self.pass_word)
+        return f"('{self.u_name}', '{self.pass_word}')"
 
 
 class users(db.Model):
@@ -52,8 +71,16 @@ class users(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(120), nullable=False)
     password = db.Column(db.String(120), nullable=False)
+    register_id = db.Column(db.Integer, db.ForeignKey("register.id"))
+    uuid = db.Column(db.String(36), unique=True, default=str(uuid.uuid4()))
+    register = db.relationship("register", backref=db.backref("register", lazy=True))
+    # hier wordt de password en username geencrypt
 
-    def __repr__(self):
+    def __repr__(self, username, password):
+        self.username = username
+        self.username = fernet.encrypt(bytes(username), encoding="utf8")
+        self.password = fernet.encrypt(bytes(password), encoding="utf8")
+        print(self.username, self.password)
         return f"('{self.id}', '{self.username}','{self.password}')"
 
 
@@ -77,18 +104,48 @@ def login():
     password = request.form.get("password")
     if request.method == "POST":
         if user(username, password):
+            # new_user = users(
+            #     username=register(username),
+            #     password=register(password),
+            #     register_id=register.id,
+            #     uuid=uuid.uuid4(),
+            # )
+            # db.session.add(new_user)
+            # db.session.commit()
             return redirect("/applicaties")
         else:
             return render_template("login.html")
     return render_template("login.html")
 
 
-def user(username, password):
-    user = users.query.filter_by(username=username, password=password).first()
+def user(u_name, pass_word):
+    user = register.query.filter_by(u_name=u_name, pass_word=pass_word).first()
     if user:
         return True
     else:
         return False
+
+
+@app.route("/register", methods=["POST", "GET"])
+def register_user():
+    u_name = request.form.get("u_name")
+    pass_word = request.form.get("pass_word")
+    if request.method == "POST":
+        new_register = register(u_name=u_name, pass_word=pass_word)
+
+        db.session.add(new_register)
+        db.session.commit()
+        print(pass_word, u_name)
+        return render_template(
+            "register.html",
+            u_name=u_name,
+            pass_word=pass_word,
+        )
+    if request.method == "GET":
+        print("lukte n iet")
+        return render_template("register.html", u_name=u_name, pass_word=pass_word)
+    else:
+        return print("lukte niet")
 
 
 @app.route("/index")
@@ -120,7 +177,7 @@ def scherm_applicaties():
         conn = sqlite3.connect("database.db")
         cur = conn.cursor()
         cur.execute("SELECT * FROM applicaties")
-        applicaties = cur.fetchall()
+        applications = cur.fetchall()
         conn = sqlite3.connect("database.db")
         cur = conn.cursor()
         cur.execute("SELECT * FROM omgevingen")
@@ -131,7 +188,7 @@ def scherm_applicaties():
         bestanden = cur.fetchall()
         return render_template(
             "applicaties.html",
-            applicaties=applicaties,
+            applications=applications,
             omgevingen=omgevingen,
             bestanden=bestanden,
         )
@@ -250,6 +307,7 @@ def open_bestand(applicaties_id, omgevingen_id):
 
     if request.method == "POST":
         bestandnaam = request.form.get("bestandnaam")
+        print(bestandnaam)
         omgevingen_id = request.form.get("omgevingen_id")
         applicaties_id = request.form.get("applicaties_id")
         conn = sqlite3.connect("database.db")
@@ -338,11 +396,17 @@ def api_logging():
         ]
 
 
-@app.route("/a")
+@app.route("/naam", methods=["POST", "GET"])
 def a():
-    return render_template("a.html")
+
+    naam = request.form.get("naam")
+    print(naam)
+    return render_template("naam.html", naam=naam)
 
 
 if __name__ == "__main__":
     db.create_all()
-    app.run(debug=True, host="0.0.0.0", port=80)
+    app.run(debug=True)
+
+
+# sqlite:////Users/Nizar/OneDrive - Hogeschool Rotterdam/SecureWP3/database.db"
