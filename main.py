@@ -1,3 +1,4 @@
+import base64
 from flask import Flask, render_template, request, jsonify, redirect, send_file
 from flask_sqlalchemy import SQLAlchemy
 import sqlite3
@@ -9,7 +10,7 @@ from flask_ipfilter import IPFilter, Whitelist
 from cryptography.fernet import Fernet
 from sqlalchemy_utils import EncryptedType, StringEncryptedType
 import datetime
-
+import os
 
 app = Flask(__name__)
 app.app_context().push()
@@ -26,6 +27,7 @@ db.init_app(app)
 # hier maak ik de encypted key
 key = Fernet.generate_key()
 fernet = Fernet(key)
+print(key)
 
 
 class applicaties(db.Model):
@@ -60,8 +62,8 @@ class register(db.Model):
 
     def __init__(self, u_name, pass_word):
 
-        self.u_name = fernet.encrypt(u_name.encode("utf-8")).decode("utf-8")
-        self.pass_word = fernet.encrypt(pass_word.encode("utf-8")).decode("utf-8")
+        self.u_name = fernet.encrypt(u_name.encode("utf-8"))
+        self.pass_word = fernet.encrypt(pass_word.encode("utf-8"))
         print(self.u_name, self.pass_word)
         return f"('{self.u_name}', '{self.pass_word}')"
 
@@ -78,8 +80,7 @@ class users(db.Model):
 
     def __repr__(self, username, password):
         self.username = username
-        self.username = fernet.encrypt(bytes(username), encoding="utf8")
-        self.password = fernet.encrypt(bytes(password), encoding="utf8")
+        self.password = password
         print(self.username, self.password)
         return f"('{self.id}', '{self.username}','{self.password}')"
 
@@ -104,14 +105,7 @@ def login():
     password = request.form.get("password")
     if request.method == "POST":
         if user(username, password):
-            # new_user = users(
-            #     username=register(username),
-            #     password=register(password),
-            #     register_id=register.id,
-            #     uuid=uuid.uuid4(),
-            # )
-            # db.session.add(new_user)
-            # db.session.commit()
+
             return redirect("/applicaties")
         else:
             return render_template("login.html")
@@ -119,7 +113,13 @@ def login():
 
 
 def user(u_name, pass_word):
-    user = register.query.filter_by(u_name=u_name, pass_word=pass_word).first()
+    us_name = fernet.encrypt(u_name.encode("utf-8"))
+    passt_word = fernet.encrypt(pass_word.encode("utf-8"))
+    user = register.query.filter_by(
+        u_name=fernet.decrypt(us_name.decode("utf-8")),
+        pass_word=fernet.decrypt(passt_word.decode("utf-8")),
+    ).first()
+    print(u_name, pass_word)
     if user:
         return True
     else:
@@ -135,7 +135,7 @@ def register_user():
 
         db.session.add(new_register)
         db.session.commit()
-        print(pass_word, u_name)
+        # print(fernet.decrypt(pass_word.encode("utf-8")), u_name)
         return render_template(
             "register.html",
             u_name=u_name,
