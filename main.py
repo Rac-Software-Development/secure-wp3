@@ -9,26 +9,29 @@ import uuid
 import os
 from flask_ipfilter import IPFilter, Whitelist
 from cryptography.fernet import Fernet
-
+from dotenv import load_dotenv
+import os
 import datetime
 import os
 
 app = Flask(__name__)
 app.app_context().push()
 db = SQLAlchemy()
-app.config["SECRET_KEY"] = "NIZAR"
-app.config["SQLALCHEMY_DATABASE_URI"] = (
-    "sqlite:////Users/Nizar/OneDrive - Hogeschool Rotterdam/secure-wp3/database.db"
-)
+load_dotenv()
+import os
+
+database_url = os.getenv("DATABASE_URI")
+secret_key = os.getenv("SECRET_KEY")
+app.config["SECRET_KEY"] = secret_key
+app.config["SQLALCHEMY_DATABASE_URI"] = database_url
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 ip_filter = IPFilter(app, ruleset=Whitelist())
 ip_filter.ruleset.permit("127.0.0.1")
 
 db.init_app(app)
 # hier maak ik de encypted key
-key = b"J3dfqz31DSyQJbO-FAVkxTJaHhBoT0yj8UrYjRx8YJU="
+key = os.getenv("DATABASE_KEY")
 fernet = Fernet(key)
-print(key)
 
 
 class applicaties(db.Model):
