@@ -1,6 +1,15 @@
 import base64
 import binascii
-from flask import Flask, render_template, request, jsonify, redirect, send_file
+from flask import (
+    Flask,
+    flash,
+    render_template,
+    request,
+    jsonify,
+    redirect,
+    send_file,
+    session,
+)
 from flask_sqlalchemy import SQLAlchemy
 import sqlite3
 import json
@@ -14,11 +23,13 @@ import os
 import datetime
 import os
 
+
 app = Flask(__name__)
 app.app_context().push()
 db = SQLAlchemy()
 load_dotenv()
 import os
+
 
 database_url = os.getenv("DATABASE_URI")
 secret_key = os.getenv("SECRET_KEY")
@@ -54,9 +65,13 @@ class bestanden(db.Model):
     omgevingen = db.relationship(
         "omgevingen", backref=db.backref("bestanden", lazy=True)
     )
+    applicaties_id = db.Column(db.Integer, db.ForeignKey("applicaties.id"))
+    applicatie = db.relationship(
+        "applicaties", backref=db.backref("bestanden", lazy=True)
+    )
 
     def __repr__(self):
-        return f"('{self.id}', '{self.bestand}','{self.omgevingen_id}')"
+        return f"('{self.id}', '{self.bestand}','{self.omgevingen_id},{self.applicaties_id}')"
 
 
 class register(db.Model):
@@ -87,21 +102,19 @@ class omgevingen(db.Model):
         return f"('{self.id}', '{self.test_omgeving}','{self.productie_omgeving}', '{self.applicaties_id}')"
 
 
-class users(db.Model):
-    __tablename__ = "users"
+class admin(db.Model):
+    __tablename__ = "admin"
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(120), nullable=False)
-    password = db.Column(db.String(120), nullable=False)
-    register_id = db.Column(db.Integer, db.ForeignKey("register.id"))
-    uuid = db.Column(db.String(36), unique=True, default=str(uuid.uuid4()))
-    register = db.relationship("register", backref=db.backref("register", lazy=True))
+    adminname = db.Column(db.String(120), nullable=False)
+    admin_pass = db.Column(db.String(120), nullable=False)
+
     # hier wordt de password en username geencrypt
 
-    def __repr__(self, username, password):
-        self.username = username
-        self.password = password
-        print(self.username, self.password)
-        return f"('{self.id}', '{self.username}','{self.password}')"
+    def __init__(self, adminname, admin_pass):
+        self.adminname = fernet.encrypt(adminname.encode("utf-8"))
+        self.admin_pass = fernet.encrypt(admin_pass.encode("utf-8"))
+
+        return f"( '{self.adminname}','{self.admin_pass}')"
 
 
 class logging(db.Model):
@@ -122,12 +135,19 @@ class logging(db.Model):
 def login():
     username = request.form.get("username")
     password = request.form.get("password")
+    adminname = request.form.get("adminname")
+    adminpass = request.form.get("admin_pass")
     if request.method == "POST":
         if user(username, password):
 
+            return redirect("/testcorrect")
+
+        if admins(adminname, adminpass):
+            flash("are you an administrator")
             return redirect("/applicaties")
         else:
             return render_template("login.html")
+
     return render_template("login.html")
 
 
@@ -135,13 +155,22 @@ def user(username, password):
     for i in register.query.all():
         usersname = fernet.decrypt(i.u_name).decode("utf-8")
         passsword = fernet.decrypt(i.pass_word).decode("utf-8")
-        print(f"{i}, {usersname}, {passsword}")
+
         if username == usersname and password == passsword:
-            print(username, password)
 
             return True
         else:
 
+            return False
+
+
+def admins(adminname, adminpass):
+    for i in admin.query.all():
+        adminname1 = fernet.decrypt(i.adminname).decode("utf-8")
+        adminpass1 = fernet.decrypt(i.admin_pass).decode("utf-8")
+        if adminname == adminname1 and adminpass1 == adminpass:
+            return True
+        else:
             return False
 
 
@@ -167,6 +196,28 @@ def register_user():
         return print("lukte niet")
 
 
+@app.route("/admin", methods=["POST", "GET"])
+def register_admin():
+    adminname = request.form.get("adminname")
+    admin_pass = request.form.get("admin_pass")
+    if request.method == "POST":
+        new_admin = admin(adminname=adminname, admin_pass=admin_pass)
+
+        db.session.add(new_admin)
+        db.session.commit()
+        # print(fernet.decrypt(pass_word.encode("utf-8")), u_name)
+        return render_template(
+            "admin.html",
+            adminname=adminname,
+            admin_pass=admin_pass,
+        )
+    if request.method == "GET":
+        print("jij bent admin")
+        return render_template("admin.html", adminname=adminname, admin_pass=admin_pass)
+    else:
+        return print("jij bent geen admin")
+
+
 @app.route("/index")
 def index():
     return render_template("app1.html")
@@ -174,6 +225,25 @@ def index():
 
 @app.route("/testcorrect")
 def testCorrect():
+    if request.method == "GET":
+        conn = sqlite3.connect("database.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM applicaties")
+        applications = cur.fetchall()
+        conn = sqlite3.connect("database.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM omgevingen")
+        omgevingen = cur.fetchall()
+        conn = sqlite3.connect("database.db")
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM bestanden")
+        bestanden = cur.fetchall()
+        return render_template(
+            "testcorrect.html",
+            applications=applications,
+            omgevingen=omgevingen,
+            bestanden=bestanden,
+        )
     return render_template("testcorrect.html")
 
 
@@ -297,7 +367,7 @@ def saves_omgevingen(applicaties_id):
 
         cur.fetchone()
         conn.commit()
-        conn.close()
+        cur.close()
 
         return redirect("/index")
 
@@ -333,13 +403,13 @@ def open_bestand(applicaties_id, omgevingen_id):
         cur = conn.cursor()
         cur.execute("PRAGMA foreign_keys = ON;")
         cur.execute(
-            " INSERT INTO bestanden (bestandnaam,omgevingen_id,applicaties_id) VALUES (?,?,?);",
+            " INSERT INTO bestanden (bestand,omgevingen_id,applicaties_id) VALUES (?,?,?);",
             (bestandnaam, omgevingen_id, applicaties_id),
         )
 
         cur.fetchone()
         conn.commit()
-        conn.close()
+        cur.close()
         return redirect("/index")
 
 
@@ -347,7 +417,7 @@ def open_bestand(applicaties_id, omgevingen_id):
 def download(applicatie_id, omgevingen_id, bestand_uuid):
     conn = sqlite3.connect("database.db")
     cursor = conn.cursor()
-    cursor.execute("SELECT bestandnaam FROM bestanden")
+    cursor.execute("SELECT bestand FROM bestanden")
     bestandnaam = cursor.fetchall()
     cursor.execute("SELECT id FROM omgevingen WHERE id=?", (omgevingen_id,))
     omgeving = cursor.fetchall()
@@ -426,6 +496,3 @@ def a():
 if __name__ == "__main__":
     db.create_all()
     app.run(debug=True)
-
-
-# sqlite:////Users/Nizar/OneDrive - Hogeschool Rotterdam/SecureWP3/database.db"

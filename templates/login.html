@@ -10,7 +10,7 @@
 </head>
 
 <body>
-  <h1>Login</h1>
+  <h1>Login User</h1>
   <form method="post" action="/login">
     <div>
       <label for="username" class="color">username:</label>
@@ -22,7 +22,20 @@
     </div>
     <button type="submit">log in</button>
   </form>
-
+<br>
+<br>
+<h1>Login Admin</h1>
+  <form method="post" action="/login">
+    <div>
+      <label for="adminname" class="color">admin:</label>
+      <input type="text" id="adminname" name="adminname" required>
+    </div>
+    <div>
+      <label for="ip">password:</label>
+      <input type="password" id="admin_pass" name="admin_pass" required>
+    </div>
+    <button type="submit">log in</button>
+  </form>
 </body>
 
 </html>
