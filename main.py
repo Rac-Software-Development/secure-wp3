@@ -1,4 +1,5 @@
 import base64
+import binascii
 from flask import Flask, render_template, request, jsonify, redirect, send_file
 from flask_sqlalchemy import SQLAlchemy
 import sqlite3
@@ -8,7 +9,7 @@ import uuid
 import os
 from flask_ipfilter import IPFilter, Whitelist
 from cryptography.fernet import Fernet
-from sqlalchemy_utils import EncryptedType, StringEncryptedType
+
 import datetime
 import os
 
@@ -17,7 +18,7 @@ app.app_context().push()
 db = SQLAlchemy()
 app.config["SECRET_KEY"] = "NIZAR"
 app.config["SQLALCHEMY_DATABASE_URI"] = (
-    "sqlite:////Users/Nizar/OneDrive - Hogeschool Rotterdam/SecureWP3/database.db"
+    "sqlite:////Users/Nizar/OneDrive - Hogeschool Rotterdam/secure-wp3/database.db"
 )
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 ip_filter = IPFilter(app, ruleset=Whitelist())
@@ -25,7 +26,7 @@ ip_filter.ruleset.permit("127.0.0.1")
 
 db.init_app(app)
 # hier maak ik de encypted key
-key = Fernet.generate_key()
+key = b"J3dfqz31DSyQJbO-FAVkxTJaHhBoT0yj8UrYjRx8YJU="
 fernet = Fernet(key)
 print(key)
 
@@ -40,20 +41,21 @@ class applicaties(db.Model):
         return f"('{self.id}', '{self.naam}','{self.ip}')"
 
 
-# class bestanden(db.Model):
-#     __tablename__ = "bestanden"
+class bestanden(db.Model):
+    __tablename__ = "bestanden"
 
-#     id = db.Column(db.Integer, primary_key=True)
-#     bestand = db.Column(db.String(120), nullable=False)
-#     omgevingen_id = db.Column(db.Integer, db.ForeignKey("omgevingen.id"))
-#     uuid = db.Column(db.String(36), unique=True, default=str(uuid.uuid4()))
-#     omgevingen = db.relationship(
-#         "omgevingen", backref=db.backref("bestanden", lazy=True)
-#     )
+    id = db.Column(db.Integer, primary_key=True)
+    bestand = db.Column(db.String(120), nullable=False)
+    omgevingen_id = db.Column(db.Integer, db.ForeignKey("omgevingen.id"))
+    uuid = db.Column(db.String(36), unique=True, default=str(uuid.uuid4()))
+    omgevingen = db.relationship(
+        "omgevingen", backref=db.backref("bestanden", lazy=True)
+    )
+
+    def __repr__(self):
+        return f"('{self.id}', '{self.bestand}','{self.omgevingen_id}')"
 
 
-#     def __repr__(self):
-#         return f"('{self.id}', '{self.bestand}','{self.omgevingen_id}')"
 class register(db.Model):
     __tablename__ = "register"
     id = db.Column(db.Integer, primary_key=True)
@@ -64,8 +66,22 @@ class register(db.Model):
 
         self.u_name = fernet.encrypt(u_name.encode("utf-8"))
         self.pass_word = fernet.encrypt(pass_word.encode("utf-8"))
-        print(self.u_name, self.pass_word)
+
         return f"('{self.u_name}', '{self.pass_word}')"
+
+
+class omgevingen(db.Model):
+    __tablename__ = "omgevingen"
+    id = db.Column(db.Integer, primary_key=True)
+    test_omgeving = db.Column(db.String(120), nullable=False)
+    productie_omgeving = db.Column(db.String(120), nullable=False)
+    applicaties_id = db.Column(db.Integer, db.ForeignKey("applicaties.id"))
+    applicatie = db.relationship(
+        "applicaties", backref=db.backref("omgevingen", lazy=True)
+    )
+
+    def __repr__(self):
+        return f"('{self.id}', '{self.test_omgeving}','{self.productie_omgeving}', '{self.applicaties_id}')"
 
 
 class users(db.Model):
@@ -112,18 +128,18 @@ def login():
     return render_template("login.html")
 
 
-def user(u_name, pass_word):
-    us_name = fernet.encrypt(u_name.encode("utf-8"))
-    passt_word = fernet.encrypt(pass_word.encode("utf-8"))
-    user = register.query.filter_by(
-        u_name=fernet.decrypt(us_name.decode("utf-8")),
-        pass_word=fernet.decrypt(passt_word.decode("utf-8")),
-    ).first()
-    print(u_name, pass_word)
-    if user:
-        return True
-    else:
-        return False
+def user(username, password):
+    for i in register.query.all():
+        usersname = fernet.decrypt(i.u_name).decode("utf-8")
+        passsword = fernet.decrypt(i.pass_word).decode("utf-8")
+        print(f"{i}, {usersname}, {passsword}")
+        if username == usersname and password == passsword:
+            print(username, password)
+
+            return True
+        else:
+
+            return False
 
 
 @app.route("/register", methods=["POST", "GET"])
