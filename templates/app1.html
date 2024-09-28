@@ -70,7 +70,7 @@
   
       
     function dragon() {
-      
+      DOMPurify.sanitize(dragon);
       $.ajax({
         url: "http://127.0.0.1:5000/api/logging",
         dataType: "json",
