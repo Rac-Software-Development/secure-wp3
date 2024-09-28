@@ -132,30 +132,30 @@
             text += data[i].id + "<br>"
           }
           let myId = "#id"
-          $(myId).append(text);
+          $(myId).text(text);
           var text2 = ""
           for (var i = 0; i < data.length; i++) {
             text2 += data[i].ip + "<br>"
           }
-          $("#ip").append(value)(text2);
+          $("#ip").text(value)(text2);
           var text3 = ""
           for (var i = 0; i < data.length; i++) {
             text3 += data[i].omgeving + "<br>"
           }
           let om = "#omg"
-          $(om).append(text3);
+          $(om).text(text3);
           var text4 = ""
           for (var i = 0; i < data.length; i++) {
             text4 += data[i].tijdstip + "<br>"
           }
           let time = "tijd"
-          $("#tijd").append(text4);
+          $("#tijd").text(text4);
           var text5 = ""
           for (var i = 0; i < data.length; i++) {
             text5 += data[i].melding + "<br>"
           }
           let me = "#meld"
-          $(me).append(text5);
+          $(me).text(text5);
           console.log(data);
 
         },
