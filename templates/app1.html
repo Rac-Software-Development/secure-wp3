@@ -67,7 +67,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
   <script lang="javascript">
     $(document).ready(
-  
+    
       
     function dragon() {
       
@@ -81,31 +81,31 @@
             text += data[i].id + "<br>"
           }
           let new_id = "#id"
-          $(new_id).append(text);
+          $(new_id).text(text);
           var text2 = ""
           for (var i = 0; i < data.length; i++) {
             text2 += data[i].ip + "<br>"
           }
           let new_ip = "#ip" 
-          $("#ip").append(text2);
+          $("#ip").text(text2);
           var text3 = ""
           for (var i = 0; i < data.length; i++) {
             text3 += data[i].omgeving + "<br>"
           }
           let omg = "#omg"
-          $("#omg").append(text3);
+          $("#omg").text(text3);
           var text4 = ""
           for (var i = 0; i < data.length; i++) {
             text4 += data[i].tijdstip + "<br>"
           }
           let time2 = "#tijd"
-          $("#tijd").append(text4);
+          $("#tijd").text(text4);
           var text5 = ""
           for (var i = 0; i < data.length; i++) {
             text5 += data[i].melding + "<br>"
           }
-          let mel = "#"
-          $("#meld").append(text5);
+          let mel = "#meld"
+          $("#meld").text(text5);
           console.log(data);
 
         },
