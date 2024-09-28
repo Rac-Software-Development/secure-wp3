@@ -43,27 +43,34 @@
   </div>
 
   <table>
-    <thead>
+    <tr>
       <th>id</th>
       <th>ip</th>
       <th>omgeving</th>
       <th>tijdstip</th>
       <th>melding</th>
-    </thead>
-    <tbody>
+    </tr>
+   
+     <tr style="height:50px;"></tr>>
       <td id="id"></td>
       <td id="ip"></td>
       <td id="omg"></td>
       <td id="tijd"></td>
       <td id="meld"></td>
-    </tbody>
+    </tr>
+    
+    
   </table>
 
   <button style="width: auto;" onclick="button()">button</button>
   <p id="p"></p>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
   <script lang="javascript">
-    $(document).ready(function dragon() {
+    $(document).ready(
+  
+      
+    function dragon() {
+      
       $.ajax({
         url: "http://127.0.0.1:5000/api/logging",
         dataType: "json",
@@ -118,13 +125,13 @@
           for (var i = 0; i < data.length; i++) {
             text += data[i].id + "<br>"
           }
-
+          
           $("#id").append(text);
           var text2 = ""
           for (var i = 0; i < data.length; i++) {
             text2 += data[i].ip + "<br>"
           }
-          $("#ip").append(text2);
+          $("#ip").append(value)(text2);
           var text3 = ""
           for (var i = 0; i < data.length; i++) {
             text3 += data[i].omgeving + "<br>"

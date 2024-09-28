@@ -120,11 +120,11 @@ class admin(db.Model):
 class logging(db.Model):
     __tablename__ = "logging"
     id = db.Column(db.Integer, primary_key=True)
-    ip = db.Column(db.String(120), nullable=False)
-    omgeving = db.Column(db.String(120), nullable=False)
+    ip = db.Column(db.String(120), nullable=True)
+    omgeving = db.Column(db.String(120), nullable=True)
     tijdstip = db.Column(db.DateTime())
 
-    melding = db.Column(db.String(120), nullable=False)
+    melding = db.Column(db.String(120), nullable=True)
 
     def __repr__(self):
         return f"('{self.ip}','{self.id}', '{self.omgeving}','{self.tijdstip}',{self.melding})"
@@ -439,13 +439,17 @@ def download(applicatie_id, omgevingen_id, bestand_uuid):
 
 @app.route("/api/logging", methods=["GET", "POST"])
 def api_logging():
+
     if request.method == "GET":
+
         conn = sqlite3.connect("database.db")
         cursor = conn.cursor()
+
         cursor.execute("SELECT id FROM logging")
         id = cursor.fetchall()
         cursor.execute("SELECT ip FROM logging")
         ip = cursor.fetchall()
+
         cursor.execute("SELECT omgeving FROM logging")
         omgeving = cursor.fetchall()
         cursor.execute("SELECT tijdstip FROM logging")
@@ -465,15 +469,24 @@ def api_logging():
         conn = sqlite3.connect("database.db")
         cursor = conn.cursor()
         cursor.execute("SELECT id FROM logging")
-        id = cursor.fetchall()
+        id = cursor.fetchone()
+        data = cursor.execute("SELECT  ip from applicaties").fetchone()[-1]
+        cursor.execute("INSERT INTO logging (ip) VALUES (?)", (str(data),))
         cursor.execute("SELECT ip FROM logging")
-        ip = cursor.fetchall()
+        ip = cursor.fetchone()[-1]
+        omgeving1 = cursor.execute("SELECT  test_omgeving from omgevingen").fetchone()[
+            -1
+        ]
+        cursor.execute("INSERT INTO logging (omgeving) VALUES (?)", (str(omgeving1),))
         cursor.execute("SELECT omgeving FROM logging")
-        omgeving = cursor.fetchall()
+        omgeving = cursor.fetchone()[-1]
         cursor.execute("SELECT tijdstip FROM logging")
-        tijdstip = cursor.fetchall()
+        tijdstip = cursor.fetchone()[-1]
         cursor.execute("SELECT melding FROM logging")
         melding = cursor.fetchall()
+        conn.commit()
+        cursor.close()
+
         return [
             {
                 "id": id,
