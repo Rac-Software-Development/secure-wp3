@@ -70,7 +70,7 @@
   
       
     function dragon() {
-      DOMPurify.sanitize(dragon);
+      
       $.ajax({
         url: "http://127.0.0.1:5000/api/logging",
         dataType: "json",
@@ -120,13 +120,15 @@
         method: "POST",
         dataType: "json",
 
+        
+
         success: function (data) {
           var text = ""
           for (var i = 0; i < data.length; i++) {
             text += data[i].id + "<br>"
           }
-          
-          $("#id").append(text);
+          let myId = "#id"
+          $(myId).append(text);
           var text2 = ""
           for (var i = 0; i < data.length; i++) {
             text2 += data[i].ip + "<br>"
@@ -161,6 +163,7 @@
       })
     }
 
+   
   </script>
   <li></li>
 </body>
