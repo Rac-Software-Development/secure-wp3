@@ -80,27 +80,31 @@
           for (var i = 0; i < data.length; i++) {
             text += data[i].id + "<br>"
           }
-
-          $("#id").append(text);
+          let new_id = "#id"
+          $(new_id).append(text);
           var text2 = ""
           for (var i = 0; i < data.length; i++) {
             text2 += data[i].ip + "<br>"
           }
+          let new_ip = "#ip" 
           $("#ip").append(text2);
           var text3 = ""
           for (var i = 0; i < data.length; i++) {
             text3 += data[i].omgeving + "<br>"
           }
+          let omg = "#omg"
           $("#omg").append(text3);
           var text4 = ""
           for (var i = 0; i < data.length; i++) {
             text4 += data[i].tijdstip + "<br>"
           }
+          let time2 = "#tijd"
           $("#tijd").append(text4);
           var text5 = ""
           for (var i = 0; i < data.length; i++) {
             text5 += data[i].melding + "<br>"
           }
+          let mel = "#"
           $("#meld").append(text5);
           console.log(data);
 
@@ -138,17 +142,20 @@
           for (var i = 0; i < data.length; i++) {
             text3 += data[i].omgeving + "<br>"
           }
-          $("#omg").append(text3);
+          let om = "#omg"
+          $(om).append(text3);
           var text4 = ""
           for (var i = 0; i < data.length; i++) {
             text4 += data[i].tijdstip + "<br>"
           }
+          let time = "tijd"
           $("#tijd").append(text4);
           var text5 = ""
           for (var i = 0; i < data.length; i++) {
             text5 += data[i].melding + "<br>"
           }
-          $("#meld").append(text5);
+          let me = "#meld"
+          $(me).append(text5);
           console.log(data);
 
         },
