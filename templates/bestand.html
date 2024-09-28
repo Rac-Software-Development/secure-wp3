@@ -25,27 +25,27 @@
             text += data[i].id + "<br>"
           }
 
-          $("#id").append(text);
+          $("#id").text(text);
           var text2 = ""
           for (var i = 0; i < data.length; i++) {
             text2 += data[i].ip + "<br>"
           }
-          $("#ip").append(text2);
+          $("#ip").text(text2);
           var text3 = ""
           for (var i = 0; i < data.length; i++) {
             text3 += data[i].omgeving + "<br>"
           }
-          $("#omg").append(text3);
+          $("#omg").text(text3);
           var text4 = ""
           for (var i = 0; i < data.length; i++) {
             text4 += data[i].tijdstip + "<br>"
           }
-          $("#tijd").append(text4);
+          $("#tijd").text(text4);
           var text5 = ""
           for (var i = 0; i < data.length; i++) {
             text5 += data[i].melding + "<br>"
           }
-          $("#meld").append(text5);
+          $("#meld").text(text5);
           console.log(data);
 
         },
