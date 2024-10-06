@@ -23,7 +23,7 @@ import os
 import datetime
 import os
 from flask_csp.csp import csp_header
-
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.app_context().push()
@@ -111,13 +111,17 @@ class admin(db.Model):
     adminname = db.Column(db.String(120), nullable=False)
     admin_pass = db.Column(db.String(120), nullable=False)
 
-    # hier wordt de password en username geencrypt
+    # hier wordt de password en username gehashed
 
     def __init__(self, adminname, admin_pass):
         self.adminname = fernet.encrypt(adminname.encode("utf-8"))
-        self.admin_pass = fernet.encrypt(admin_pass.encode("utf-8"))
+        self.admin_pass = generate_password_hash(admin_pass)
 
         return f"( '{self.adminname}','{self.admin_pass}')"
+
+    # hier checkt of de admin hash gelijk is aan de input hash van een admin
+    def check_password(self, password):
+        return check_password_hash(self.admin_pass, password)
 
 
 class logging(db.Model):
@@ -170,8 +174,9 @@ def user(username, password):
 def admins(adminname, adminpass):
     for i in admin.query.all():
         adminname1 = fernet.decrypt(i.adminname).decode("utf-8")
-        adminpass1 = fernet.decrypt(i.admin_pass).decode("utf-8")
-        if adminname == adminname1 and adminpass1 == adminpass:
+
+        adminpass1 = check_password_hash(admin.admin_pass, adminpass)
+        if adminname == adminname1 and adminpass1:
             return True
 
     return False
