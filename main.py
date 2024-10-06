@@ -22,6 +22,7 @@ from dotenv import load_dotenv
 import os
 import datetime
 import os
+from flask_csp.csp import csp_header
 
 
 app = Flask(__name__)
@@ -39,7 +40,9 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 ip_filter = IPFilter(app, ruleset=Whitelist())
 ip_filter.ruleset.permit("127.0.0.1")
 
+
 db.init_app(app)
+
 # hier maak ik de encypted key
 key = os.getenv("DATABASE_KEY")
 fernet = Fernet(key)
@@ -506,6 +509,15 @@ def a():
     return render_template("naam.html", naam=naam)
 
 
+@app.after_request
+def add_header(response):
+    response.headers["X-Frame-Options"] = "Deny"
+    response.headers["Content-Security-Policy"] = "default-src 'self' ;"
+
+    return response
+
+
 if __name__ == "__main__":
     db.create_all()
     app.run(debug=False)
+    # request.headers["Content-Security-Policy: default-src 'self'"]

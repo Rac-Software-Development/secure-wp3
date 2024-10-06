@@ -64,6 +64,7 @@
 
   <button style="width: auto;" onclick="button()">button</button>
   <p id="p"></p>
+  
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
   <script lang="javascript">
     $(document).ready(
@@ -82,6 +83,8 @@
           }
           let new_id = "#id"
           $(new_id).text(text);
+          alert($(new_id).text(text))
+
           var text2 = ""
           for (var i = 0; i < data.length; i++) {
             text2 += data[i].ip + "<br>"
@@ -133,6 +136,7 @@
           }
           let myId = "#id"
           $(myId).text(text);
+          alert($(myId).text(text))
           var text2 = ""
           for (var i = 0; i < data.length; i++) {
             text2 += data[i].ip + "<br>"
