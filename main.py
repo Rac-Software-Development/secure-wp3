@@ -146,9 +146,10 @@ def login():
             return redirect("/testcorrect")
 
         if admins(adminname, adminpass):
-            flash("are you an administrator")
+            print("admin")
             return redirect("/applicaties")
         else:
+
             return render_template("login.html")
 
     return render_template("login.html")
@@ -162,9 +163,8 @@ def user(username, password):
         if username == usersname and password == passsword:
 
             return True
-        else:
 
-            return False
+    return False
 
 
 def admins(adminname, adminpass):
@@ -173,8 +173,8 @@ def admins(adminname, adminpass):
         adminpass1 = fernet.decrypt(i.admin_pass).decode("utf-8")
         if adminname == adminname1 and adminpass1 == adminpass:
             return True
-        else:
-            return False
+
+    return False
 
 
 @app.route("/register", methods=["POST", "GET"])
@@ -509,15 +509,15 @@ def a():
     return render_template("naam.html", naam=naam)
 
 
-@app.after_request
-def add_header(response):
-    response.headers["X-Frame-Options"] = "Deny"
-    response.headers["Content-Security-Policy"] = "default-src 'self' ;"
+# @app.after_request
+# def add_header(response):
+#     response.headers["X-Frame-Options"] = "Deny"
+#     response.headers["Content-Security-Policy"] = "default-src 'self' ;"
 
-    return response
+#     return response
 
 
 if __name__ == "__main__":
     db.create_all()
-    app.run(debug=False)
+    app.run(debug=True)
     # request.headers["Content-Security-Policy: default-src 'self'"]
