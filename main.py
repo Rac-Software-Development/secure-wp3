@@ -86,9 +86,10 @@ class register(db.Model):
     def __init__(self, u_name, pass_word):
 
         self.u_name = fernet.encrypt(u_name.encode("utf-8"))
-        self.pass_word = fernet.encrypt(pass_word.encode("utf-8"))
+        self.pass_word = generate_password_hash(pass_word)
 
-        return f"('{self.u_name}', '{self.pass_word}')"
+    def check(self, password):
+        return check_password_hash(self.pass_word, password)
 
 
 class omgevingen(db.Model):
@@ -150,11 +151,8 @@ def login():
             return redirect("/testcorrect")
 
         if admins(adminname, adminpass):
-            print("admin")
-            return redirect("/applicaties")
-        else:
 
-            return render_template("login.html")
+            return redirect("/applicaties")
 
     return render_template("login.html")
 
@@ -162,9 +160,10 @@ def login():
 def user(username, password):
     for i in register.query.all():
         usersname = fernet.decrypt(i.u_name).decode("utf-8")
-        passsword = fernet.decrypt(i.pass_word).decode("utf-8")
+        print(i.u_name, i.pass_word)
+        passsword = check_password_hash(i.pass_word, password)
 
-        if username == usersname and password == passsword:
+        if username == usersname and passsword:
 
             return True
 
@@ -174,8 +173,9 @@ def user(username, password):
 def admins(adminname, adminpass):
     for i in admin.query.all():
         adminname1 = fernet.decrypt(i.adminname).decode("utf-8")
+        print(i.adminname, i.admin_pass)
 
-        adminpass1 = check_password_hash(admin.admin_pass, adminpass)
+        adminpass1 = check_password_hash(i.admin_pass, adminpass)
         if adminname == adminname1 and adminpass1:
             return True
 
